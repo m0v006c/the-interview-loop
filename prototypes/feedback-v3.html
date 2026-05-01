@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scoring page v3 — two-column</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; }
+  pre { font-family: ui-monospace, SF Mono, Menlo, monospace; }
+  .chev { transition: transform .15s; }
+  details[open] > summary .chev { transform: rotate(90deg); }
+  .fade-in { animation: fi .18s ease both; }
+  @keyframes fi { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button class="text-sm text-gray-500 hover:text-gray-900">← Back to dashboard</button>
+      <div class="w-px h-5 bg-gray-200"></div>
+      <div class="text-sm">
+        <span class="text-gray-400">Interview complete ·</span>
+        <span class="font-medium">Number of Islands</span>
+        <span class="text-gray-400 ml-2">Problem Solving · Medium · 32:14</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="document.getElementById('ref-modal').classList.remove('hidden')"
+        class="px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-medium hover:bg-indigo-100">
+        📘 Reference solution
+      </button>
+      <button class="px-3 py-1.5 rounded-lg bg-gray-900 text-white text-xs font-medium hover:bg-gray-800">
+        Practice another →
+      </button>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-12 gap-6">
+    <!-- LEFT: Summary → key moments → transcript -->
+    <main class="col-span-12 lg:col-span-8 space-y-4">
+      <!-- 1. Interviewer summary (top of column) -->
+      <div class="bg-white rounded-xl border border-gray-100 p-5">
+        <h3 class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Interviewer summary</h3>
+        <p class="text-sm text-gray-700 leading-relaxed">
+          Solid structure and clean code — the main gaps were complexity analysis and edge-case thinking.
+          You identified BFS quickly but stumbled on O(m×n), and you didn't proactively cover empty or single-row grids.
+          With sharper complexity discipline and a habit of listing boundary cases first, this would be a clear hire.
+        </p>
+      </div>
+
+      <!-- 2. What to work on -->
+      <div class="flex items-baseline justify-between pt-2">
+        <h1 class="text-lg font-semibold tracking-tight">What to work on</h1>
+        <span class="text-xs text-gray-400">5 key moments from your interview</span>
+      </div>
+
+      <div class="space-y-2">
+        <!-- Moment 1 major -->
+        <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+          <summary class="cursor-pointer list-none px-4 py-3 flex items-center gap-3 hover:bg-gray-50 rounded-xl">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-semibold">Major</span>
+            <span class="text-xs text-gray-400 uppercase tracking-wider">Approach</span>
+            <span class="flex-1 text-sm font-medium">Stated BFS complexity as O(N log N)</span>
+            <span class="chev text-gray-400 text-xs">›</span>
+          </summary>
+          <div class="px-4 pb-4 pt-1 space-y-3 text-sm fade-in">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1">Interviewer asked</div>
+              <div class="text-gray-700 italic">"What's the time complexity of your BFS approach?"</div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <div class="text-[11px] uppercase tracking-wider text-red-600 font-semibold mb-1">Your answer</div>
+                <div class="bg-red-50 border border-red-100 rounded-lg p-3 text-gray-800 leading-relaxed">
+                  "It's O(N log N)... because we're kind of sorting through the grid."
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1">Expected answer</div>
+                <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3 text-gray-800 leading-relaxed">
+                  <b>O(m × n)</b> — each cell visited once, constant work per cell. Space also O(m × n) for the BFS queue worst-case.
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1">The gap</div>
+              <div class="text-gray-600 leading-relaxed">
+                You conflated traversal with sorting. Any graph traversal that visits each node once is O(V + E) — no log factor.
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Moment 2 major -->
+        <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+          <summary class="cursor-pointer list-none px-4 py-3 flex items-center gap-3 hover:bg-gray-50 rounded-xl">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-semibold">Major</span>
+            <span class="text-xs text-gray-400 uppercase tracking-wider">Test</span>
+            <span class="flex-1 text-sm font-medium">Didn't cover empty-grid or single-row edge cases</span>
+            <span class="chev text-gray-400 text-xs">›</span>
+          </summary>
+          <div class="px-4 pb-4 pt-1 space-y-3 text-sm fade-in">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1">Interviewer asked</div>
+              <div class="text-gray-700 italic">"What edge cases would you test?"</div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <div class="text-[11px] uppercase tracking-wider text-red-600 font-semibold mb-1">Your answer</div>
+                <div class="bg-red-50 border border-red-100 rounded-lg p-3 text-gray-800 leading-relaxed">
+                  "A grid with a few small islands and one big one."
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1">Expected answer</div>
+                <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3 text-gray-800 leading-relaxed">
+                  <ul class="list-disc pl-4 space-y-0.5">
+                    <li>Empty grid · Single row / column</li>
+                    <li>All water → 0 · All land → 1</li>
+                    <li>Diagonal neighbors (confirm they don't count)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1">The gap</div>
+              <div class="text-gray-600 leading-relaxed">
+                You named interesting shapes, but the interviewer wants <i>boundary</i> cases — null/empty, extremes. Different muscle.
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Moment 3 minor -->
+        <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+          <summary class="cursor-pointer list-none px-4 py-3 flex items-center gap-3 hover:bg-gray-50 rounded-xl">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold">Minor</span>
+            <span class="text-xs text-gray-400 uppercase tracking-wider">Optimize</span>
+            <span class="flex-1 text-sm font-medium">Mentioned Union-Find but didn't compare trade-offs</span>
+            <span class="chev text-gray-400 text-xs">›</span>
+          </summary>
+          <div class="px-4 pb-4 pt-1 text-sm text-gray-600 fade-in">
+            <i>[expanded body similar to above]</i>
+          </div>
+        </details>
+
+        <!-- Moment 4 positive -->
+        <details class="group bg-white rounded-xl border border-emerald-200 shadow-sm">
+          <summary class="cursor-pointer list-none px-4 py-3 flex items-center gap-3 hover:bg-emerald-50 rounded-xl">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold">✓ Strong</span>
+            <span class="text-xs text-gray-400 uppercase tracking-wider">Clarify</span>
+            <span class="flex-1 text-sm font-medium">Proactively asked about adjacency definition</span>
+            <span class="chev text-gray-400 text-xs">›</span>
+          </summary>
+          <div class="px-4 pb-4 pt-1 text-sm text-gray-600 fade-in">
+            <i>[expanded body — keep doing this]</i>
+          </div>
+        </details>
+
+        <!-- Moment 5 minor -->
+        <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+          <summary class="cursor-pointer list-none px-4 py-3 flex items-center gap-3 hover:bg-gray-50 rounded-xl">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold">Minor</span>
+            <span class="text-xs text-gray-400 uppercase tracking-wider">Implement</span>
+            <span class="flex-1 text-sm font-medium">Used recursion without discussing stack depth</span>
+            <span class="chev text-gray-400 text-xs">›</span>
+          </summary>
+          <div class="px-4 pb-4 pt-1 text-sm text-gray-600 fade-in">
+            <i>[expanded body]</i>
+          </div>
+        </details>
+      </div>
+
+      <!-- 3. Transcript (collapsible, below key moments) -->
+      <details id="transcript" class="group bg-white rounded-xl border border-gray-200 shadow-sm mt-4">
+        <summary class="cursor-pointer list-none px-4 py-3 flex items-center gap-3 hover:bg-gray-50 rounded-xl">
+          <span class="text-base">💬</span>
+          <span class="flex-1 text-sm font-medium">Conversation transcript</span>
+          <span class="text-xs text-gray-400">24 messages · 32:14</span>
+          <span class="chev text-gray-400 text-xs">›</span>
+        </summary>
+        <div class="px-4 pb-4 pt-1 space-y-3 text-sm fade-in">
+          <div class="flex">
+            <div class="max-w-[85%] px-3.5 py-2.5 rounded-[14px] rounded-bl-[4px] bg-gray-100">
+              Alright, here's your problem: "Given an m×n 2D binary grid which represents a map of '1's (land) and '0's (water), return the number of islands."
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <div class="max-w-[85%] px-3.5 py-2.5 rounded-[14px] rounded-br-[4px] bg-blue-500 text-white">
+              Before I start — does adjacency mean 4-directional or also diagonals?
+            </div>
+          </div>
+          <div class="flex">
+            <div class="max-w-[85%] px-3.5 py-2.5 rounded-[14px] rounded-bl-[4px] bg-gray-100">
+              Good question — 4-directional only. Horizontal and vertical neighbors.
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <div class="max-w-[85%] px-3.5 py-2.5 rounded-[14px] rounded-br-[4px] bg-blue-500 text-white">
+              Got it. I'll do BFS from each unvisited land cell, marking visited as I go.
+            </div>
+          </div>
+          <div class="flex">
+            <div class="max-w-[85%] px-3.5 py-2.5 rounded-[14px] rounded-bl-[4px] bg-gray-100">
+              Sounds good. What's the time complexity of your BFS approach?
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <div class="max-w-[85%] px-3.5 py-2.5 rounded-[14px] rounded-br-[4px] bg-blue-500 text-white">
+              It's O(N log N)... because we're kind of sorting through the grid.
+            </div>
+          </div>
+          <div class="flex">
+            <div class="max-w-[85%] px-3.5 py-2.5 rounded-[14px] rounded-bl-[4px] bg-gray-100">
+              Hmm, walk me through that — why log N?
+            </div>
+          </div>
+          <div class="text-center text-xs text-gray-400 py-2">... 17 more messages ...</div>
+        </div>
+      </details>
+    </main>
+
+    <!-- RIGHT: Skills + actions sticky rail -->
+    <aside class="col-span-12 lg:col-span-4">
+      <div class="lg:sticky lg:top-6 space-y-4">
+        <!-- Verdict card -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <div class="text-center">
+            <span class="inline-block px-4 py-1 rounded-full text-white font-semibold text-[13px] tracking-wide" style="background:#10B981">LEAN HIRE</span>
+            <div class="mt-2 text-[32px] font-semibold">3.4 <span class="text-gray-400 text-lg">/ 5.0</span></div>
+            <div class="text-xs text-gray-500">Overall score</div>
+          </div>
+        </div>
+
+        <!-- Dimension breakdown -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-3">Skill breakdown</h3>
+          <div class="space-y-2.5 text-sm">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-gray-700">Clarification</span><span class="text-gray-500 font-medium">4.0</span></div>
+              <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full rounded-full bg-emerald-500" style="width:80%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-gray-700">Approach &amp; complexity</span><span class="text-gray-500 font-medium">3.0</span></div>
+              <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full rounded-full bg-amber-500" style="width:60%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-gray-700">Code quality</span><span class="text-gray-500 font-medium">4.0</span></div>
+              <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full rounded-full bg-emerald-500" style="width:80%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-gray-700">Testing &amp; edge cases</span><span class="text-gray-500 font-medium">2.0</span></div>
+              <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full rounded-full bg-red-500" style="width:40%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-gray-700">Optimization depth</span><span class="text-gray-500 font-medium">3.0</span></div>
+              <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full rounded-full bg-amber-500" style="width:60%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strength / improvement -->
+        <div class="space-y-2">
+          <div class="bg-green-50 border border-green-100 rounded-xl p-3.5">
+            <div class="text-[11px] uppercase tracking-wider text-green-700 font-semibold mb-1">Top strength</div>
+            <div class="text-[13px] text-green-900 leading-relaxed">Clean BFS implementation with well-named helpers.</div>
+          </div>
+          <div class="bg-amber-50 border border-amber-100 rounded-xl p-3.5">
+            <div class="text-[11px] uppercase tracking-wider text-amber-700 font-semibold mb-1">Top improvement</div>
+            <div class="text-[13px] text-amber-900 leading-relaxed">Practice stating time/space complexity confidently.</div>
+          </div>
+        </div>
+
+        <!-- Stats tile -->
+        <div class="bg-white rounded-xl border border-gray-100 p-4 text-[12px] text-gray-500 space-y-1">
+          <div class="flex justify-between"><span>Duration</span><span class="text-gray-700 font-medium">32:14</span></div>
+          <div class="flex justify-between"><span>Phases completed</span><span class="text-gray-700 font-medium">5 / 5</span></div>
+          <div class="flex justify-between"><span>Messages exchanged</span><span class="text-gray-700 font-medium">24</span></div>
+          <div class="flex justify-between"><span>Difficulty</span><span class="text-gray-700 font-medium">Medium</span></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- REFERENCE SOLUTION MODAL -->
+  <div id="ref-modal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-start justify-center px-5 py-10 overflow-y-auto">
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl my-auto border border-gray-100" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div>
+          <div class="text-base font-semibold">Reference solution · Number of Islands</div>
+          <div class="text-xs text-gray-500 mt-0.5">How an experienced candidate would walk through this</div>
+        </div>
+        <button onclick="document.getElementById('ref-modal').classList.add('hidden')"
+          class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-900 hover:bg-gray-100">✕</button>
+      </div>
+      <div class="px-6 py-5 space-y-6 text-sm max-h-[80vh] overflow-y-auto">
+        <div class="text-gray-600 leading-relaxed"><b>Short version:</b> grid traversal — for every unvisited land cell, BFS/DFS to mark all connected land, then increment. O(m × n).</div>
+        <section>
+          <h3 class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Code (Python, BFS)</h3>
+          <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-[12px] leading-[1.6] overflow-x-auto"><code>from collections import deque
+
+def numIslands(grid):
+    if not grid or not grid[0]: return 0
+    rows, cols = len(grid), len(grid[0])
+    count = 0
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == '1':
+                count += 1
+                q = deque([(r, c)])
+                grid[r][c] = '0'
+                while q:
+                    i, j = q.popleft()
+                    for di, dj in ((-1,0),(1,0),(0,-1),(0,1)):
+                        ni, nj = i+di, j+dj
+                        if 0 <= ni < rows and 0 <= nj < cols and grid[ni][nj] == '1':
+                            grid[ni][nj] = '0'
+                            q.append((ni, nj))
+    return count</code></pre>
+        </section>
+        <section>
+          <h3 class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Complexity</h3>
+          <p class="text-gray-700"><b>Time:</b> O(m × n) · <b>Space:</b> O(m × n)</p>
+        </section>
+        <section>
+          <h3 class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Common pitfalls</h3>
+          <ul class="list-disc pl-5 text-gray-700 space-y-1">
+            <li>Claiming O(N log N) — no sorting happens.</li>
+            <li>Forgetting to mark visited → infinite loop.</li>
+            <li>DFS recursion on huge grids → stack overflow.</li>
+          </ul>
+        </section>
+      </div>
+      <div class="px-6 py-3 border-t border-gray-100 flex justify-end">
+        <button onclick="document.getElementById('ref-modal').classList.add('hidden')"
+          class="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Click outside ref modal to close
+    document.getElementById('ref-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'ref-modal') e.currentTarget.classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

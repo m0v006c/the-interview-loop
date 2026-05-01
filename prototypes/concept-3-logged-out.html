@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Concept 3 — Dashboard (logged out)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; }
+  .grid-bg {
+    background-image: radial-gradient(circle at 1px 1px, #e5e7eb 1px, transparent 0);
+    background-size: 26px 26px;
+  }
+  .card-hover { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .card-hover:hover { transform: translateY(-2px); }
+</style>
+</head>
+<body class="bg-white text-gray-900">
+  <!-- Top nav -->
+  <header class="border-b border-gray-100 bg-white/80 backdrop-blur sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto px-8 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-indigo-600 grid place-items-center text-white font-bold text-sm">L</div>
+        <div class="leading-tight">
+          <div class="text-[10px] uppercase tracking-wider text-gray-400">The</div>
+          <div class="font-semibold tracking-tight text-sm -mt-0.5">Interview Loop</div>
+        </div>
+      </div>
+      <nav class="flex items-center gap-2 text-sm">
+        <a class="px-3 py-1.5 text-gray-600 hover:text-gray-900">Tracks</a>
+        <a class="px-3 py-1.5 text-gray-600 hover:text-gray-900">Plans</a>
+        <a class="px-3 py-1.5 text-gray-600 hover:text-gray-900">Docs</a>
+        <div class="w-px h-5 bg-gray-200 mx-1"></div>
+        <button class="px-3 py-1.5 text-gray-700 hover:text-gray-900 text-sm">Sign in</button>
+        <button class="px-4 py-1.5 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800">Get started</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="grid-bg">
+    <div class="max-w-3xl mx-auto px-8 py-20 text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-200 text-xs text-gray-500 mb-5 bg-white">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        AI interviewers. Real signal. Four rounds.
+      </div>
+      <h1 class="text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05] mb-5">
+        Practice the interview.<br/>
+        <span class="text-gray-400">Not just the questions.</span>
+      </h1>
+      <p class="text-lg text-gray-500 max-w-xl mx-auto mb-8">
+        The Interview Loop runs you through real mock interviews — system design, coding, LLD, and behavioral — with an AI interviewer that pushes back and scores you on what actually matters.
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button class="px-5 py-3 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-800">
+          Start a free session
+        </button>
+        <button class="px-5 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          See how it works
+        </button>
+      </div>
+      <div class="text-xs text-gray-400 mt-4">No signup required for your first session</div>
+    </div>
+  </section>
+
+  <!-- Tracks -->
+  <section class="max-w-6xl mx-auto px-8 pb-20">
+    <div class="flex items-baseline justify-between mb-5">
+      <h2 class="text-xl font-semibold tracking-tight">Four interview tracks</h2>
+      <span class="text-sm text-gray-400">System design is live · others rolling out</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <a href="#" class="card-hover rounded-2xl border border-gray-200 bg-white p-6 hover:border-indigo-300 hover:shadow-[0_6px_24px_-8px_rgba(99,102,241,0.25)] block">
+        <div class="flex items-start justify-between mb-6">
+          <div class="w-11 h-11 rounded-xl bg-indigo-50 grid place-items-center text-xl">🏛️</div>
+          <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Live</span>
+        </div>
+        <div class="text-lg font-semibold mb-1.5">System Design</div>
+        <p class="text-sm text-gray-500 mb-5">Architect scalable systems — URL shorteners to real-time feeds — across 5 interview phases.</p>
+        <div class="flex items-center justify-between text-[13px]">
+          <span class="text-gray-400">45–60 min · 5 phases</span>
+          <span class="text-indigo-600 font-medium">Try a session →</span>
+        </div>
+      </a>
+
+      <a href="#" class="card-hover rounded-2xl border border-gray-200 bg-white p-6 hover:border-sky-300 hover:shadow-[0_6px_24px_-8px_rgba(14,165,233,0.25)] block">
+        <div class="flex items-start justify-between mb-6">
+          <div class="w-11 h-11 rounded-xl bg-sky-50 grid place-items-center text-xl">🧩</div>
+          <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">Beta soon</span>
+        </div>
+        <div class="text-lg font-semibold mb-1.5">Problem Solving</div>
+        <p class="text-sm text-gray-500 mb-5">LeetCode-style challenges with live code execution. Get reviewed on approach, not just output.</p>
+        <div class="flex items-center justify-between text-[13px]">
+          <span class="text-gray-400">Easy · Medium · Hard</span>
+          <span class="text-sky-600 font-medium">Join waitlist →</span>
+        </div>
+      </a>
+
+      <a href="#" class="card-hover rounded-2xl border border-gray-200 bg-white p-6 hover:border-emerald-300 hover:shadow-[0_6px_24px_-8px_rgba(16,185,129,0.25)] block">
+        <div class="flex items-start justify-between mb-6">
+          <div class="w-11 h-11 rounded-xl bg-emerald-50 grid place-items-center text-xl">🧱</div>
+          <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">Beta soon</span>
+        </div>
+        <div class="text-lg font-semibold mb-1.5">Low-Level Design</div>
+        <p class="text-sm text-gray-500 mb-5">Design classes, patterns, and object models with UML sketching and a reviewer who questions every coupling.</p>
+        <div class="flex items-center justify-between text-[13px]">
+          <span class="text-gray-400">OOP · Design patterns</span>
+          <span class="text-emerald-600 font-medium">Join waitlist →</span>
+        </div>
+      </a>
+
+      <a href="#" class="card-hover rounded-2xl border border-gray-200 bg-white p-6 hover:border-pink-300 hover:shadow-[0_6px_24px_-8px_rgba(236,72,153,0.25)] block">
+        <div class="flex items-start justify-between mb-6">
+          <div class="w-11 h-11 rounded-xl bg-pink-50 grid place-items-center text-xl">💬</div>
+          <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">Beta soon</span>
+        </div>
+        <div class="text-lg font-semibold mb-1.5">Behavioral &amp; Culture Fit</div>
+        <p class="text-sm text-gray-500 mb-5">STAR-structured stories, leadership principles, conflict scenarios. Feedback on tone, specificity, impact.</p>
+        <div class="flex items-center justify-between text-[13px]">
+          <span class="text-gray-400">Amazon LPs · Meta · Google</span>
+          <span class="text-pink-600 font-medium">Join waitlist →</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- How it works -->
+    <div class="mt-20">
+      <div class="text-center mb-8">
+        <div class="text-xs uppercase tracking-widest text-indigo-600 font-semibold mb-2">How it works</div>
+        <h3 class="text-2xl font-semibold tracking-tight">Three things most mock-interview tools get wrong.</h3>
+        <p class="text-gray-500 mt-2 max-w-xl mx-auto">The Interview Loop is designed around how real interviews actually play out.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="rounded-xl border border-gray-200 p-5 bg-white">
+          <div class="text-2xl mb-3">🎙️</div>
+          <div class="font-semibold mb-1">The AI behaves like a human</div>
+          <div class="text-sm text-gray-500">Not a Socratic tutor. It plays the stakeholder, asks one thing at a time, and pushes back when you hand-wave.</div>
+        </div>
+        <div class="rounded-xl border border-gray-200 p-5 bg-white">
+          <div class="text-2xl mb-3">📋</div>
+          <div class="font-semibold mb-1">Structured feedback, not vibes</div>
+          <div class="text-sm text-gray-500">Every session is scored on 6–7 dimensions with concrete examples — so you know exactly where to sharpen.</div>
+        </div>
+        <div class="rounded-xl border border-gray-200 p-5 bg-white">
+          <div class="text-2xl mb-3">🖋️</div>
+          <div class="font-semibold mb-1">The tools match the round</div>
+          <div class="text-sm text-gray-500">Whiteboard for system design. Live code editor for algorithms. Voice transcript for behavioral. Not one-size-fits-all.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-20 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 p-10 text-center">
+      <h3 class="text-2xl font-semibold tracking-tight mb-2">Try a session in under 60 seconds.</h3>
+      <p class="text-gray-500 mb-5">No signup. No card. Just pick a problem and start.</p>
+      <div class="flex items-center justify-center gap-3">
+        <button class="px-5 py-3 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-800">Try system design</button>
+        <button class="px-5 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-white">See plans</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-gray-100 py-6">
+    <div class="max-w-6xl mx-auto px-8 flex items-center justify-between text-xs text-gray-400">
+      <span>The Interview Loop · built for engineers who ship</span>
+      <div class="flex items-center gap-4">
+        <a class="hover:text-gray-700">Privacy</a>
+        <a class="hover:text-gray-700">Terms</a>
+        <a class="hover:text-gray-700">Contact</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

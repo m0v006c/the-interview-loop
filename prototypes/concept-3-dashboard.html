@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Concept 3 — Dashboard (logged in)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; }
+  .tab-active { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+  .tab { transition: all .15s; }
+  .tab:hover:not(.tab-active) { background: #f9fafb; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-60 bg-white border-r border-gray-200 flex flex-col py-5 px-3">
+      <div class="flex items-center gap-2 px-3 mb-8">
+        <div class="w-7 h-7 rounded-lg bg-indigo-600 grid place-items-center text-white font-bold text-sm">L</div>
+        <div class="leading-tight">
+          <div class="text-[10px] uppercase tracking-wider text-gray-400">The</div>
+          <div class="font-semibold tracking-tight text-sm -mt-0.5">Interview Loop</div>
+        </div>
+      </div>
+
+      <div class="text-[11px] uppercase tracking-wider text-gray-400 px-3 mb-2">Tracks</div>
+      <nav class="flex flex-col gap-0.5">
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 font-medium text-sm">
+          <span>🏠</span> Overview
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm text-gray-600">
+          <span>🏛️</span> System Design
+          <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-medium">Live</span>
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm text-gray-600">
+          <span>🧩</span> Problem Solving
+          <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">Soon</span>
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm text-gray-600">
+          <span>🧱</span> Low-Level Design
+          <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">Soon</span>
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm text-gray-600">
+          <span>💬</span> Behavioral
+          <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">Soon</span>
+        </a>
+      </nav>
+
+      <div class="text-[11px] uppercase tracking-wider text-gray-400 px-3 mt-6 mb-2">Account</div>
+      <nav class="flex flex-col gap-0.5">
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm text-gray-600">
+          <span>📊</span> Progress
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm text-gray-600">
+          <span>⚙️</span> Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 min-w-0">
+      <!-- Top bar -->
+      <div class="h-14 border-b border-gray-200 bg-white px-8 flex items-center justify-end gap-3">
+        <a class="text-sm text-gray-600 hover:text-gray-900 px-2">Plans</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900 px-2">Docs</a>
+        <button class="text-gray-500 hover:text-gray-900 text-sm">🔔</button>
+        <div class="flex items-center gap-2 pl-3 border-l border-gray-200 text-sm">
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-pink-400 to-amber-400 grid place-items-center text-[11px] text-white font-bold">M</div>
+          <span class="font-medium">Mohit V.</span>
+        </div>
+      </div>
+
+      <div class="px-8 py-8 max-w-5xl mx-auto">
+        <!-- Page heading (no generic "Start session" — sessions are track-specific) -->
+        <div class="mb-8">
+          <div class="text-xs text-gray-500 mb-1">Tuesday, April 20</div>
+          <h1 class="text-2xl font-semibold tracking-tight">Good afternoon, Mohit</h1>
+        </div>
+
+        <!-- In progress section: up to 1 card per track (max 4) -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h2 class="font-semibold tracking-tight flex items-center gap-2">
+              In progress
+              <span class="text-[11px] px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-medium">2</span>
+            </h2>
+            <span class="text-xs text-gray-400">Resume any track · most recent per track shown</span>
+          </div>
+
+          <div class="space-y-2">
+            <!-- Card 1: System Design -->
+            <div class="rounded-xl border border-gray-200 bg-white p-4 flex items-center gap-4 hover:border-indigo-200 transition-colors">
+              <div class="w-10 h-10 rounded-lg bg-indigo-50 grid place-items-center text-lg flex-shrink-0">🏛️</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium truncate">Design a URL Shortener</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 font-medium flex-shrink-0">System Design</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-0.5 flex items-center gap-3">
+                  <span>Deep-dive phase · 3 of 5</span>
+                  <span class="text-gray-300">·</span>
+                  <span>24 min in</span>
+                  <span class="text-gray-300">·</span>
+                  <span>Last active 2h ago</span>
+                </div>
+                <!-- phase progress -->
+                <div class="flex gap-1 mt-2">
+                  <div class="h-1 flex-1 rounded-full bg-indigo-500"></div>
+                  <div class="h-1 flex-1 rounded-full bg-indigo-500"></div>
+                  <div class="h-1 flex-1 rounded-full bg-indigo-300"></div>
+                  <div class="h-1 flex-1 rounded-full bg-gray-100"></div>
+                  <div class="h-1 flex-1 rounded-full bg-gray-100"></div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button class="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50">End</button>
+                <button class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700">Resume →</button>
+              </div>
+            </div>
+
+            <!-- Card 2: Low-Level Design -->
+            <div class="rounded-xl border border-gray-200 bg-white p-4 flex items-center gap-4 hover:border-emerald-200 transition-colors">
+              <div class="w-10 h-10 rounded-lg bg-emerald-50 grid place-items-center text-lg flex-shrink-0">🧱</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium truncate">Design a Chess Game</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium flex-shrink-0">Low-Level Design</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-0.5 flex items-center gap-3">
+                  <span>Class modeling phase</span>
+                  <span class="text-gray-300">·</span>
+                  <span>8 min in</span>
+                  <span class="text-gray-300">·</span>
+                  <span>Last active 3d ago</span>
+                </div>
+                <div class="flex gap-1 mt-2">
+                  <div class="h-1 flex-1 rounded-full bg-emerald-500"></div>
+                  <div class="h-1 flex-1 rounded-full bg-emerald-300"></div>
+                  <div class="h-1 flex-1 rounded-full bg-gray-100"></div>
+                  <div class="h-1 flex-1 rounded-full bg-gray-100"></div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button class="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50">End</button>
+                <button class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700">Resume →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty-state (shown when user has 0 in-progress; kept here commented as reference):
+          <div class="rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">
+            No sessions in progress. Pick a track below to start.
+          </div>
+          -->
+        </div>
+
+        <!-- Tracks list -->
+        <div class="mb-10">
+          <div class="flex items-baseline justify-between mb-3">
+            <h2 class="font-semibold tracking-tight">Tracks</h2>
+            <span class="text-xs text-gray-400">Pick a track to practice</span>
+          </div>
+          <div class="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+            <a class="flex items-center gap-4 px-5 py-4 hover:bg-gray-50">
+              <div class="w-10 h-10 rounded-lg bg-indigo-50 grid place-items-center text-lg">🏛️</div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">System Design</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-medium">Live</span>
+                </div>
+                <div class="text-xs text-gray-500">Architect scalable distributed systems · 45–60 min</div>
+              </div>
+              <div class="w-32">
+                <div class="text-[11px] text-gray-500 mb-1 text-right">Avg 3.8/5</div>
+                <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                  <div class="h-full bg-indigo-500" style="width: 76%"></div>
+                </div>
+              </div>
+              <button class="px-3 py-1.5 rounded-lg bg-gray-900 text-white text-xs font-medium">Practice</button>
+            </a>
+
+            <a class="flex items-center gap-4 px-5 py-4 opacity-70">
+              <div class="w-10 h-10 rounded-lg bg-sky-50 grid place-items-center text-lg">🧩</div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">Problem Solving</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">Soon</span>
+                </div>
+                <div class="text-xs text-gray-500">Coding challenges with live execution and AI review</div>
+              </div>
+              <div class="w-32 text-right text-xs text-gray-400">Launch: ~2 weeks</div>
+              <button class="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-600">Notify me</button>
+            </a>
+
+            <a class="flex items-center gap-4 px-5 py-4 opacity-70">
+              <div class="w-10 h-10 rounded-lg bg-emerald-50 grid place-items-center text-lg">🧱</div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">Low-Level Design</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">Soon</span>
+                </div>
+                <div class="text-xs text-gray-500">OOP, class modeling, and design patterns</div>
+              </div>
+              <div class="w-32 text-right text-xs text-gray-400">Launch: ~3 weeks</div>
+              <button class="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-600">Notify me</button>
+            </a>
+
+            <a class="flex items-center gap-4 px-5 py-4 opacity-70">
+              <div class="w-10 h-10 rounded-lg bg-rose-50 grid place-items-center text-lg">💬</div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">Behavioral &amp; Culture Fit</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">Soon</span>
+                </div>
+                <div class="text-xs text-gray-500">STAR stories, leadership principles, conflict scenarios</div>
+              </div>
+              <div class="w-32 text-right text-xs text-gray-400">Launch: ~4 weeks</div>
+              <button class="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-600">Notify me</button>
+            </a>
+          </div>
+        </div>
+
+        <!-- Skill breakdown (tabbed by track) -->
+        <div>
+          <div class="flex items-baseline justify-between mb-3">
+            <h2 class="font-semibold tracking-tight">Skill breakdown</h2>
+            <span class="text-xs text-gray-400">Based on your scored sessions</span>
+          </div>
+
+          <div class="rounded-xl border border-gray-200 bg-white p-5">
+            <!-- Track tabs -->
+            <div class="flex gap-2 mb-5 border-b border-gray-100 pb-3">
+              <button class="tab tab-active text-xs font-medium px-3 py-1.5 rounded-full border">System Design</button>
+              <button class="tab text-xs font-medium px-3 py-1.5 rounded-full border border-gray-200 text-gray-500">Problem Solving</button>
+              <button class="tab text-xs font-medium px-3 py-1.5 rounded-full border border-gray-200 text-gray-500">Low-Level Design</button>
+              <button class="tab text-xs font-medium px-3 py-1.5 rounded-full border border-gray-200 text-gray-500">Behavioral</button>
+            </div>
+
+            <!-- Skills for active tab: System Design -->
+            <div class="grid grid-cols-2 gap-x-8 gap-y-3.5 text-sm">
+              <div>
+                <div class="flex justify-between mb-1"><span>Requirements gathering</span><span class="text-gray-500">4.0</span></div>
+                <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden"><div class="h-full bg-indigo-500" style="width:80%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1"><span>High-level design</span><span class="text-gray-500">3.5</span></div>
+                <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden"><div class="h-full bg-indigo-500" style="width:70%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1"><span>Deep-dive depth</span><span class="text-gray-500">3.0</span></div>
+                <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden"><div class="h-full bg-amber-500" style="width:60%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1"><span>Trade-off reasoning</span><span class="text-gray-500">2.8</span></div>
+                <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden"><div class="h-full bg-amber-500" style="width:56%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1"><span>Scalability &amp; evolution</span><span class="text-gray-500">3.6</span></div>
+                <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden"><div class="h-full bg-indigo-500" style="width:72%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1"><span>Communication</span><span class="text-gray-500">4.2</span></div>
+                <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden"><div class="h-full bg-emerald-500" style="width:84%"></div></div>
+              </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+              <span>Based on 8 scored sessions</span>
+              <a class="text-indigo-600 hover:underline">Reset System Design progress →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty-state preview (commented example for other tabs) -->
+        <!-- When a locked track tab is active, show:
+             "No data yet — complete your first [Track] session to see your skill breakdown here."
+        -->
+      </div>
+    </main>
+  </div>
+</body>
+</html>
