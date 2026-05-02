@@ -24,14 +24,8 @@ const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const PORT = process.env.PORT || 3001; // Cloud Run injects PORT
 
 if (!ANTHROPIC_API_KEY) {
-  console.error("\n\x1b[31m╔══════════════════════════════════════════════════════════╗");
-  console.error("║  ANTHROPIC_API_KEY is not set!                          ║");
-  console.error("║                                                          ║");
-  console.error("║  1. Copy .env.example to .env                           ║");
-  console.error("║  2. Add your key: ANTHROPIC_API_KEY=sk-ant-...          ║");
-  console.error("║  3. Get a key at: https://console.anthropic.com         ║");
-  console.error("╚══════════════════════════════════════════════════════════╝\x1b[0m\n");
-  process.exit(1);
+  // Warn but keep running — Cloud Run env vars may load after startup
+  console.warn("[WARNING] ANTHROPIC_API_KEY is not set. API calls will fail until it is configured.");
 }
 
 // Proxy endpoint for Claude API
