@@ -2,8 +2,9 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install -g npm@latest && npm install --no-package-lock
+# Install only the 3 packages server.js actually needs
+# Bypasses package-lock.json compatibility issues entirely
+RUN npm install express@^4 node-fetch@^3 dotenv@^16 --no-save
 
 COPY server.js ./
 
