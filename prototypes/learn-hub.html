@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Learn Hub — prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-60 bg-white border-r border-gray-100 flex flex-col py-5 px-3 flex-shrink-0">
+      <div class="flex items-center gap-2 px-3 mb-8">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-[11px]">IL</div>
+        <div class="leading-tight">
+          <div class="text-[10px] uppercase tracking-wider text-gray-400">The</div>
+          <div class="font-semibold tracking-tight text-sm -mt-0.5">Interview Loop</div>
+        </div>
+      </div>
+      <div class="text-[11px] uppercase tracking-wider text-gray-400 px-3 mb-2">Tracks</div>
+      <nav class="flex flex-col gap-0.5 mb-4">
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">🏠 Overview</a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">🏛️ System Design</a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">💬 Behavioral</a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">🧩 Problem Solving</a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">🧱 Low-Level Design</a>
+      </nav>
+      <div class="text-[11px] uppercase tracking-wider text-gray-400 px-3 mb-2">Learn</div>
+      <nav class="flex flex-col gap-0.5 mb-4">
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 font-medium text-sm">📚 Learning Hub</a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">🏛️ System Design</a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">🧱 Low-Level Design</a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">🧩 Algorithms</a>
+      </nav>
+      <div class="text-[11px] uppercase tracking-wider text-gray-400 px-3 mb-2">Account</div>
+      <nav class="flex flex-col gap-0.5">
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">📜 History</a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">⏸ In progress</a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 flex flex-col">
+      <!-- Top bar -->
+      <div class="h-14 border-b border-gray-100 bg-white px-8 flex items-center justify-between">
+        <div></div>
+        <div class="flex items-center gap-3 text-sm">
+          <a class="text-gray-600 px-2">Plans</a>
+          <a class="text-gray-600 px-2">Docs</a>
+          <div class="flex items-center gap-2 pl-3 border-l border-gray-200">
+            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-pink-400 to-amber-400 grid place-items-center text-[11px] text-white font-bold">M</div>
+            <span class="font-medium">Mohit ▾</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-1 px-8 py-8 max-w-6xl mx-auto w-full">
+        <!-- Header -->
+        <div class="mb-8">
+          <h1 class="text-2xl font-semibold tracking-tight">Learning Hub</h1>
+          <p class="text-sm text-gray-500 mt-1">Structured reading material — master concepts through real problems, from fundamentals to expert depth.</p>
+        </div>
+
+        <!-- SD Learning Path -->
+        <section class="mb-10">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-xl">🏛️</span>
+            <h2 class="text-lg font-semibold">System Design</h2>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 font-medium">Live</span>
+          </div>
+
+          <!-- Main journey card -->
+          <a href="learn-sd.html" class="block rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-6 mb-3 hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer">
+            <div class="flex items-start justify-between mb-3">
+              <span class="text-[11px] uppercase tracking-wider text-indigo-600 font-semibold">Main journey · 8 sections</span>
+              <span class="text-[11px] text-gray-400">~4-5 hrs</span>
+            </div>
+            <div class="text-lg font-semibold mb-1.5">Designing a Notification System</div>
+            <p class="text-sm text-gray-600 leading-relaxed mb-4">
+              Build a real-time notification system from scratch. This single problem naturally introduces message queues, rate limiting, circuit breakers, CQRS, event sourcing, retry patterns, and dead-letter queues — exactly the distributed systems concepts that come up in every MAANG interview.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">Kafka / Message Queues</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">CQRS</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">Circuit Breakers</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">Event Sourcing</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">Rate Limiting</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">Redis</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">Dead-Letter Queues</span>
+            </div>
+            <div class="mt-4 text-sm text-indigo-600 font-medium">Start reading →</div>
+          </a>
+
+          <!-- Supplementary topics -->
+          <div class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-2 px-1">Supplementary topics</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">🌐</div>
+              <div class="text-sm font-medium mb-1">CDN Architecture</div>
+              <div class="text-[12px] text-gray-500">How edge caching works, POP placement, cache invalidation strategies</div>
+              <div class="text-[11px] text-gray-400 mt-2">~15 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">🔍</div>
+              <div class="text-sm font-medium mb-1">Service Discovery</div>
+              <div class="text-[12px] text-gray-500">Consul, Eureka, DNS-based discovery — how microservices find each other</div>
+              <div class="text-[11px] text-gray-400 mt-2">~20 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">📊</div>
+              <div class="text-sm font-medium mb-1">Distributed Tracing</div>
+              <div class="text-[12px] text-gray-500">Jaeger, Zipkin, correlation IDs, trace propagation across services</div>
+              <div class="text-[11px] text-gray-400 mt-2">~15 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">🔒</div>
+              <div class="text-sm font-medium mb-1">Consistent Hashing</div>
+              <div class="text-[12px] text-gray-500">Virtual nodes, load distribution, minimal data movement on resharding</div>
+              <div class="text-[11px] text-gray-400 mt-2">~25 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">💾</div>
+              <div class="text-sm font-medium mb-1">Distributed Transactions</div>
+              <div class="text-[12px] text-gray-500">2PC, Saga pattern, eventual consistency trade-offs</div>
+              <div class="text-[11px] text-gray-400 mt-2">~30 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">📐</div>
+              <div class="text-sm font-medium mb-1">CAP Theorem Deep Dive</div>
+              <div class="text-[12px] text-gray-500">Consistency, availability, partition tolerance — choosing your trade-offs</div>
+              <div class="text-[11px] text-gray-400 mt-2">~20 min</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LLD Learning Path -->
+        <section class="mb-10">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-xl">🧱</span>
+            <h2 class="text-lg font-semibold">Low-Level Design</h2>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 font-medium">Live</span>
+          </div>
+
+          <a href="#" class="block rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 mb-3 hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer">
+            <div class="flex items-start justify-between mb-3">
+              <span class="text-[11px] uppercase tracking-wider text-emerald-600 font-semibold">Main journey · 7 sections</span>
+              <span class="text-[11px] text-gray-400">~3-4 hrs</span>
+            </div>
+            <div class="text-lg font-semibold mb-1.5">Designing a Ride-Sharing System (LLD)</div>
+            <p class="text-sm text-gray-600 leading-relaxed mb-4">
+              Design the class structure of an Uber-like system. Along the way we introduce all 5 SOLID principles, OOP fundamentals, and 8 design patterns organically — Strategy for pricing, State for ride lifecycle, Observer for notifications, Factory for driver matching, and more.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">SOLID Principles</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">Strategy Pattern</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">State Pattern</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">Observer</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">Factory</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">Decorator</span>
+            </div>
+            <div class="mt-4 text-sm text-emerald-600 font-medium">Start reading →</div>
+          </a>
+
+          <div class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-2 px-1">Supplementary topics</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">🧩</div>
+              <div class="text-sm font-medium mb-1">Builder &amp; Composite Pattern</div>
+              <div class="text-[12px] text-gray-500">When to use Builder vs telescoping constructors. Composite for tree structures.</div>
+              <div class="text-[11px] text-gray-400 mt-2">~20 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">🎭</div>
+              <div class="text-sm font-medium mb-1">Command &amp; Template Method</div>
+              <div class="text-[12px] text-gray-500">Undo/redo with Command. Code reuse with Template Method hooks.</div>
+              <div class="text-[11px] text-gray-400 mt-2">~20 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">🔗</div>
+              <div class="text-sm font-medium mb-1">Chain of Responsibility</div>
+              <div class="text-[12px] text-gray-500">Middleware pipelines, validation chains, handler delegation</div>
+              <div class="text-[11px] text-gray-400 mt-2">~15 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">🪆</div>
+              <div class="text-sm font-medium mb-1">Proxy &amp; Flyweight</div>
+              <div class="text-[12px] text-gray-500">Lazy loading, access control, and sharing memory-efficient objects</div>
+              <div class="text-[11px] text-gray-400 mt-2">~15 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">🔄</div>
+              <div class="text-sm font-medium mb-1">Iterator &amp; Memento</div>
+              <div class="text-[12px] text-gray-500">Traversal abstraction and snapshotting object state for undo</div>
+              <div class="text-[11px] text-gray-400 mt-2">~15 min</div>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              <div class="text-base mb-1">💠</div>
+              <div class="text-sm font-medium mb-1">Concurrency Patterns</div>
+              <div class="text-[12px] text-gray-500">Thread safety, locks, double-checked locking, immutability</div>
+              <div class="text-[11px] text-gray-400 mt-2">~25 min</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Coming soon tracks -->
+        <section class="opacity-60">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-xl">🧩</span>
+            <h2 class="text-lg font-semibold">Algorithms & Problem Solving</h2>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 font-medium">Coming soon</span>
+          </div>
+          <div class="rounded-xl border border-dashed border-gray-200 p-5 text-sm text-gray-500">
+            Graph traversal, dynamic programming, sliding window, binary search — each explained through a real interview problem with Java implementations.
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

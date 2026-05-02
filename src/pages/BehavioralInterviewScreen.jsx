@@ -21,6 +21,7 @@ export default function BehavioralInterviewScreen() {
 
   const canvasSnapshotFn = useRef(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [chatWidthPct, setChatWidthPct] = useState(30); // only used when canvas is open
   const isResizing = useRef(false);
 
@@ -128,7 +129,7 @@ export default function BehavioralInterviewScreen() {
         </div>
 
         <button
-          onClick={endInterview}
+          onClick={() => setShowEndConfirm(true)}
           className="px-3.5 py-1.5 rounded-lg bg-red-500 text-white text-[13px] font-medium hover:bg-red-600 transition-colors"
         >
           End interview
@@ -183,6 +184,38 @@ export default function BehavioralInterviewScreen() {
           </div>
         )}
       </div>
+
+      {/* End interview confirmation */}
+      {showEndConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-sm mx-4 shadow-2xl border border-gray-100 dark:border-gray-800">
+            <div className="text-base font-semibold mb-1">End this interview?</div>
+            <div className="text-sm text-gray-500 mb-5 leading-relaxed">
+              You're doing well — finishing the remaining phases gives you richer feedback. Or exit now and pick up where you left off later.
+            </div>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => setShowEndConfirm(false)}
+                className="w-full py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                Keep going
+              </button>
+              <button
+                onClick={() => { setShowEndConfirm(false); goHome(); }}
+                className="w-full py-2.5 rounded-xl border border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+              >
+                Exit — resume later
+              </button>
+              <button
+                onClick={() => { setShowEndConfirm(false); endInterview(); }}
+                className="w-full py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+              >
+                End &amp; get feedback
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Exit confirmation */}
       {showExitConfirm && (

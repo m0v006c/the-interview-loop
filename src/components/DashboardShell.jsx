@@ -15,7 +15,7 @@ const SIDEBAR_TRACKS = [
  * screens are NOT wrapped in the shell (they're focus-mode).
  */
 export default function DashboardShell({ children }) {
-  const { screen, homeTrack, enterTrackHome, goLanding, enterHistory, enterInProgress } = useInterviewStore();
+  const { screen, homeTrack, enterTrackHome, goLanding, enterHistory, enterInProgress, enterLearnHub, enterLearnReading, learnTrack } = useInterviewStore();
   const user = useAuthStore((s) => s.user);
   const openSignIn = useAuthStore((s) => s.openSignIn);
 
@@ -66,6 +66,26 @@ export default function DashboardShell({ children }) {
           ))}
         </nav>
 
+        {import.meta.env.VITE_ENABLE_LEARN_HUB === "true" && (
+          <>
+            <div className="text-[11px] uppercase tracking-wider text-gray-400 px-3 mt-6 mb-2">Learn</div>
+            <nav className="flex flex-col gap-0.5">
+              <button onClick={enterLearnHub} className={linkCls(screen === "learn_hub")}>
+                <span>📚</span>
+                <span className="flex-1">Learning Hub</span>
+              </button>
+              <button onClick={() => enterLearnReading("system_design")} className={linkCls(screen === "learn_reading" && learnTrack === "system_design")}>
+                <span>🏛️</span>
+                <span className="flex-1">System Design</span>
+              </button>
+              <button onClick={() => enterLearnReading("low_level_design")} className={linkCls(screen === "learn_reading" && learnTrack === "low_level_design")}>
+                <span>🧱</span>
+                <span className="flex-1">Low-Level Design</span>
+              </button>
+            </nav>
+          </>
+        )}
+
         <div className="text-[11px] uppercase tracking-wider text-gray-400 px-3 mt-6 mb-2">Account</div>
         <nav className="flex flex-col gap-0.5">
           <button
@@ -86,11 +106,13 @@ export default function DashboardShell({ children }) {
             <span>⏸</span>
             <span className="flex-1">In progress</span>
           </button>
-          <button className={linkCls(false) + " cursor-not-allowed opacity-60"} disabled>
-            <span>⚙️</span>
-            <span className="flex-1">Settings</span>
-            <span className="text-[10px] text-gray-400">soon</span>
-          </button>
+          {import.meta.env.VITE_ENABLE_TOP_NAV_EXTRAS === "true" && (
+            <button className={linkCls(false) + " cursor-not-allowed opacity-60"} disabled>
+              <span>⚙️</span>
+              <span className="flex-1">Settings</span>
+              <span className="text-[10px] text-gray-400">soon</span>
+            </button>
+          )}
         </nav>
       </aside>
 
@@ -98,11 +120,17 @@ export default function DashboardShell({ children }) {
       <main className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <div className="h-14 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-8 flex items-center justify-end gap-3 flex-shrink-0">
-          <a className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 px-2 cursor-pointer">Plans</a>
-          <a className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 px-2 cursor-pointer">Docs</a>
+          {import.meta.env.VITE_ENABLE_TOP_NAV_EXTRAS === "true" && (
+            <>
+              <a className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 px-2 cursor-pointer">Plans</a>
+              <a className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 px-2 cursor-pointer">Docs</a>
+            </>
+          )}
           {user ? (
             <>
-              <button className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 text-sm" title="Notifications">🔔</button>
+              {import.meta.env.VITE_ENABLE_TOP_NAV_EXTRAS === "true" && (
+                <button className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 text-sm" title="Notifications">🔔</button>
+              )}
               <UserMenu />
             </>
           ) : (

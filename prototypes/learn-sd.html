@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SD Learning — Notification System</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; }
+  pre { font-family: ui-monospace, SF Mono, Menlo, monospace; }
+  .active-toc { color: #4f46e5; font-weight: 600; border-left: 2px solid #4f46e5; }
+  .toc-item { border-left: 2px solid transparent; }
+</style>
+</head>
+<body class="bg-white text-gray-900 min-h-screen">
+  <!-- Top nav bar -->
+  <header class="sticky top-0 z-20 bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="learn-hub.html" class="text-sm text-gray-500 hover:text-gray-900">← Learning Hub</a>
+      <div class="w-px h-5 bg-gray-200"></div>
+      <div class="text-sm">
+        <span class="text-gray-400">🏛️ System Design · </span>
+        <span class="font-medium">Designing a Notification System</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 text-xs text-gray-500">
+      <span>8 sections · ~4-5 hrs</span>
+      <div class="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden">
+        <div class="h-full bg-indigo-500 rounded-full" style="width: 25%"></div>
+      </div>
+      <span class="text-indigo-600 font-medium">2 / 8</span>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto flex">
+    <!-- Left TOC -->
+    <nav class="w-64 flex-shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto py-6 px-4 border-r border-gray-100">
+      <div class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-3">Contents</div>
+      <ul class="space-y-0.5 text-[13px]">
+        <li class="toc-item px-3 py-1.5 text-gray-500 cursor-pointer hover:text-gray-900 rounded-r-lg hover:bg-gray-50">
+          <span class="text-gray-400 mr-1.5">1.</span>The Problem
+        </li>
+        <li class="active-toc px-3 py-1.5 text-indigo-600 cursor-pointer rounded-r-lg bg-indigo-50">
+          <span class="text-indigo-400 mr-1.5">2.</span>Architecture Overview
+        </li>
+        <li class="toc-item px-3 py-1.5 text-gray-500 cursor-pointer hover:text-gray-900 rounded-r-lg hover:bg-gray-50">
+          <span class="text-gray-400 mr-1.5">3.</span>Message Queues (Kafka)
+        </li>
+        <li class="toc-item px-3 py-1.5 text-gray-500 cursor-pointer hover:text-gray-900 rounded-r-lg hover:bg-gray-50">
+          <span class="text-gray-400 mr-1.5">4.</span>Rate Limiting
+        </li>
+        <li class="toc-item px-3 py-1.5 text-gray-500 cursor-pointer hover:text-gray-900 rounded-r-lg hover:bg-gray-50">
+          <span class="text-gray-400 mr-1.5">5.</span>Circuit Breakers
+        </li>
+        <li class="toc-item px-3 py-1.5 text-gray-500 cursor-pointer hover:text-gray-900 rounded-r-lg hover:bg-gray-50">
+          <span class="text-gray-400 mr-1.5">6.</span>CQRS Pattern
+        </li>
+        <li class="toc-item px-3 py-1.5 text-gray-500 cursor-pointer hover:text-gray-900 rounded-r-lg hover:bg-gray-50">
+          <span class="text-gray-400 mr-1.5">7.</span>Event Sourcing
+        </li>
+        <li class="toc-item px-3 py-1.5 text-gray-500 cursor-pointer hover:text-gray-900 rounded-r-lg hover:bg-gray-50">
+          <span class="text-gray-400 mr-1.5">8.</span>Scaling to Billions
+        </li>
+      </ul>
+
+      <div class="mt-8 text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-3">On this page</div>
+      <ul class="space-y-0.5 text-[12px] text-gray-500">
+        <li class="px-3 py-1 cursor-pointer hover:text-gray-900">Components</li>
+        <li class="px-3 py-1 cursor-pointer hover:text-gray-900">Data flow</li>
+        <li class="px-3 py-1 cursor-pointer hover:text-gray-900">Database schema</li>
+        <li class="px-3 py-1 cursor-pointer hover:text-gray-900">Code example</li>
+      </ul>
+    </nav>
+
+    <!-- Main content -->
+    <article class="flex-1 max-w-3xl px-10 py-8 space-y-8">
+
+      <!-- Section heading -->
+      <div>
+        <div class="text-[11px] uppercase tracking-wider text-indigo-600 font-semibold mb-2">Section 2 of 8</div>
+        <h1 class="text-3xl font-bold tracking-tight mb-3">Architecture Overview</h1>
+        <p class="text-gray-600 leading-relaxed text-lg">
+          Before we build, let's sketch the full picture. A notification system has three jobs: accept events from anywhere, route them to the right channel, and deliver reliably even when things break.
+        </p>
+      </div>
+
+      <!-- Key concepts callout -->
+      <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+        <div class="text-[11px] uppercase tracking-wider text-indigo-600 font-semibold mb-2">Concepts introduced in this section</div>
+        <div class="flex flex-wrap gap-2">
+          <span class="text-xs px-2 py-0.5 bg-white border border-indigo-200 rounded-full text-indigo-700">Event-driven architecture</span>
+          <span class="text-xs px-2 py-0.5 bg-white border border-indigo-200 rounded-full text-indigo-700">Producer / Consumer</span>
+          <span class="text-xs px-2 py-0.5 bg-white border border-indigo-200 rounded-full text-indigo-700">Idempotency</span>
+          <span class="text-xs px-2 py-0.5 bg-white border border-indigo-200 rounded-full text-indigo-700">Fan-out pattern</span>
+        </div>
+      </div>
+
+      <!-- Text content -->
+      <section>
+        <h2 class="text-xl font-semibold mb-3">The five core components</h2>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          Our system needs five layers. Each one has a single responsibility, which makes the system testable, scalable, and replaceable.
+        </p>
+        <div class="space-y-3">
+          <div class="flex gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 grid place-items-center text-indigo-700 font-bold text-sm flex-shrink-0">1</div>
+            <div>
+              <div class="font-semibold text-sm">Event Ingestion API</div>
+              <div class="text-sm text-gray-600 mt-0.5">Accepts events from any upstream service. REST or gRPC. Must be fast and non-blocking — it should acknowledge immediately and hand off to the queue.</div>
+            </div>
+          </div>
+          <div class="flex gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 grid place-items-center text-indigo-700 font-bold text-sm flex-shrink-0">2</div>
+            <div>
+              <div class="font-semibold text-sm">Message Queue (Kafka)</div>
+              <div class="text-sm text-gray-600 mt-0.5">Decouples ingestion from delivery. Consumers read at their own pace. Retained messages enable replay on failure — we'll deep-dive this in Section 3.</div>
+            </div>
+          </div>
+          <div class="flex gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 grid place-items-center text-indigo-700 font-bold text-sm flex-shrink-0">3</div>
+            <div>
+              <div class="font-semibold text-sm">Notification Router</div>
+              <div class="text-sm text-gray-600 mt-0.5">Reads user preferences and routes each event to the correct channels: push, email, SMS, in-app. This is where the fan-out pattern lives.</div>
+            </div>
+          </div>
+          <div class="flex gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 grid place-items-center text-indigo-700 font-bold text-sm flex-shrink-0">4</div>
+            <div>
+              <div class="font-semibold text-sm">Channel Delivery Workers</div>
+              <div class="text-sm text-gray-600 mt-0.5">One worker per channel type. Each wraps a third-party provider (FCM, SendGrid, Twilio). Circuit breakers sit here — covered in Section 5.</div>
+            </div>
+          </div>
+          <div class="flex gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 grid place-items-center text-indigo-700 font-bold text-sm flex-shrink-0">5</div>
+            <div>
+              <div class="font-semibold text-sm">Notification Store</div>
+              <div class="text-sm text-gray-600 mt-0.5">PostgreSQL for user preferences and delivery logs. Redis for deduplication and delivery status. Supports the inbox / "mark as read" UX.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Code section -->
+      <section>
+        <h2 class="text-xl font-semibold mb-3">Database schema</h2>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          Two critical tables. <code class="bg-gray-100 px-1.5 py-0.5 rounded text-sm">notification_events</code> is append-only — never update, only insert. This sets us up for event sourcing later.
+        </p>
+        <pre class="bg-gray-900 text-gray-100 rounded-xl p-5 text-[12.5px] leading-[1.7] overflow-x-auto"><code>-- Append-only event log (never UPDATE this table)
+CREATE TABLE notification_events (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      BIGINT      NOT NULL,
+  event_type   VARCHAR(64) NOT NULL,  -- e.g. 'order.shipped', 'friend.request'
+  payload      JSONB       NOT NULL,
+  idempotency_key VARCHAR(128) UNIQUE, -- prevents duplicate sends
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- User preferences (which channels for which event type)
+CREATE TABLE notification_preferences (
+  user_id      BIGINT NOT NULL,
+  event_type   VARCHAR(64) NOT NULL,
+  channel      VARCHAR(32) NOT NULL,  -- 'push', 'email', 'sms', 'in_app'
+  enabled      BOOLEAN NOT NULL DEFAULT true,
+  PRIMARY KEY (user_id, event_type, channel)
+);
+
+-- Delivery log (one row per attempt per channel)
+CREATE TABLE delivery_log (
+  id           BIGSERIAL PRIMARY KEY,
+  event_id     UUID REFERENCES notification_events(id),
+  channel      VARCHAR(32) NOT NULL,
+  status       VARCHAR(16) NOT NULL,  -- 'pending', 'sent', 'failed', 'bounced'
+  provider_id  VARCHAR(128),          -- FCM message ID, SendGrid ID, etc.
+  attempted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  error_msg    TEXT
+);</code></pre>
+      </section>
+
+      <!-- Concept callout box -->
+      <section>
+        <div class="border border-amber-200 bg-amber-50 rounded-xl p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-base">💡</span>
+            <span class="font-semibold text-amber-900">Why the idempotency key?</span>
+          </div>
+          <p class="text-sm text-amber-800 leading-relaxed">
+            Networks fail. Retry logic is essential. But if we retry without an idempotency key, a user gets the same push notification three times. The <code class="bg-amber-100 px-1 rounded">UNIQUE</code> constraint on <code class="bg-amber-100 px-1 rounded">idempotency_key</code> guarantees the database rejects duplicates even if your application layer retries. The caller generates this key — typically <code class="bg-amber-100 px-1 rounded">SHA256(user_id + event_type + timestamp_bucket)</code>.
+          </p>
+        </div>
+      </section>
+
+      <!-- Code: Java service -->
+      <section>
+        <h2 class="text-xl font-semibold mb-3">The ingestion API — code walkthrough</h2>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          The API accepts events, validates, persists, and immediately enqueues. It must return in under 10ms — so no synchronous delivery here.
+        </p>
+        <pre class="bg-gray-900 text-gray-100 rounded-xl p-5 text-[12.5px] leading-[1.7] overflow-x-auto"><code>@RestController
+@RequestMapping("/v1/notifications")
+public class NotificationIngestionController {
+
+    private final NotificationEventRepository eventRepo;
+    private final KafkaTemplate&lt;String, NotificationEvent&gt; kafka;
+
+    @PostMapping("/events")
+    public ResponseEntity&lt;NotificationResponse&gt; ingestEvent(
+            @RequestBody @Valid NotificationRequest req) {
+
+        // 1. Persist first — Kafka publish is NOT transactional with the DB
+        NotificationEvent event = NotificationEvent.builder()
+            .userId(req.getUserId())
+            .eventType(req.getEventType())
+            .payload(req.getPayload())
+            .idempotencyKey(req.getIdempotencyKey())
+            .build();
+
+        try {
+            eventRepo.save(event);  // throws DataIntegrityViolationException on duplicate
+        } catch (DataIntegrityViolationException e) {
+            // Duplicate — return 200 as if we processed it (idempotent response)
+            return ResponseEntity.ok(NotificationResponse.alreadyProcessed(req.getIdempotencyKey()));
+        }
+
+        // 2. Publish to Kafka after successful DB write
+        kafka.send("notification-events", event.getUserId().toString(), event);
+
+        return ResponseEntity.accepted().body(NotificationResponse.accepted(event.getId()));
+    }
+}</code></pre>
+        <div class="mt-3 bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
+          <strong>Notice:</strong> We persist to the database <em>before</em> publishing to Kafka. If Kafka is unavailable, the event is still saved. A separate outbox processor can retry the Kafka publish later. This is the <strong>Transactional Outbox pattern</strong> — we'll cover it fully in Section 7 (Event Sourcing).
+        </div>
+      </section>
+
+      <!-- Interview tip -->
+      <section class="bg-green-50 border border-green-200 rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-base">🎯</span>
+          <span class="font-semibold text-green-900">Interview tip — this section</span>
+        </div>
+        <p class="text-sm text-green-800 leading-relaxed">
+          Interviewers test whether you know the difference between <em>fire-and-forget</em> and <em>reliable delivery</em>. When asked "how do you ensure every notification is delivered?", walk through: persist first → enqueue → worker picks up → retry on failure → dead-letter queue for unrecoverable failures. That answer alone demonstrates senior-level thinking.
+        </p>
+      </section>
+
+      <!-- Navigation -->
+      <div class="flex justify-between pt-6 border-t border-gray-100">
+        <a class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
+          ← Section 1: The Problem
+        </a>
+        <a class="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800">
+          Section 3: Message Queues (Kafka) →
+        </a>
+      </div>
+    </article>
+
+    <!-- Right margin (future: key terms, related problems) -->
+    <div class="w-56 flex-shrink-0 py-8 px-4 hidden xl:block">
+      <div class="sticky top-20 space-y-4">
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-2">Key terms</div>
+          <div class="space-y-1 text-[12px]">
+            <div class="px-2 py-1 bg-gray-50 rounded text-gray-700 cursor-pointer hover:bg-indigo-50 hover:text-indigo-700">Fan-out pattern</div>
+            <div class="px-2 py-1 bg-gray-50 rounded text-gray-700 cursor-pointer hover:bg-indigo-50 hover:text-indigo-700">Idempotency key</div>
+            <div class="px-2 py-1 bg-gray-50 rounded text-gray-700 cursor-pointer hover:bg-indigo-50 hover:text-indigo-700">Outbox pattern</div>
+            <div class="px-2 py-1 bg-gray-50 rounded text-gray-700 cursor-pointer hover:bg-indigo-50 hover:text-indigo-700">Append-only log</div>
+          </div>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-2">Practice this</div>
+          <a class="block text-[12px] text-indigo-600 hover:underline">→ Design a Notification System</a>
+          <a class="block text-[12px] text-indigo-600 hover:underline mt-1">→ Design a Rate Limiter</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

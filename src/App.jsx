@@ -7,6 +7,8 @@ import LandingScreen from "@/pages/LandingScreen";
 import HomeScreen from "@/pages/HomeScreen";
 import HistoryScreen from "@/pages/HistoryScreen";
 import InProgressScreen from "@/pages/InProgressScreen";
+import LearnHubScreen from "@/pages/LearnHubScreen";
+import LearnReadingScreen from "@/pages/LearnReadingScreen";
 import InterviewScreen from "@/pages/InterviewScreen";
 import BehavioralInterviewScreen from "@/pages/BehavioralInterviewScreen";
 import NotepadInterviewScreen from "@/pages/NotepadInterviewScreen";
@@ -52,10 +54,12 @@ export default function App() {
     if (screen === "scoring") return <ScoringScreen />;
     return (
       <DashboardShell>
-        {screen === "home"        ? <HomeScreen /> :
-         screen === "history"     ? <HistoryScreen /> :
-         screen === "in_progress" ? <InProgressScreen /> :
-                                    <LandingScreen />}
+        {screen === "home"          ? <HomeScreen /> :
+         screen === "history"       ? <HistoryScreen /> :
+         screen === "in_progress"   ? <InProgressScreen /> :
+         screen === "learn_hub"     ? <LearnHubScreen /> :
+         screen === "learn_reading" ? <LearnReadingScreen /> :
+                                      <LandingScreen />}
       </DashboardShell>
     );
   })();

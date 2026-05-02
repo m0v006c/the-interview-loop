@@ -178,12 +178,19 @@ You are in the EVOLVE phase — the final stretch. This is where we test extensi
 END OF INTERVIEW: When you've thrown 2-3 extensibility/failure-mode challenges at the candidate and they've demonstrated their design can evolve, wrap up naturally — e.g., "Alright, that's all I had — really liked how you structured [X]. Thanks for walking me through this." Then append <end-interview/> on its own line at the very end of your response. This triggers automatic scoring, so only use it when you're genuinely done.`,
 };
 
-export const LLD_SCORING_PROMPT = (problem, transcript, language = "Java") => `You are evaluating a low-level design interview. Problem: "${problem.description}"
+export const LLD_SCORING_PROMPT = (problem, transcript, language = "Java", notepadContent = null) => `You are evaluating a low-level design interview. Problem: "${problem.description}"
 
 The candidate was working in ${language} — the reference solution's class skeleton MUST be in ${language} (idiomatic class signatures and method bodies).
 
-Transcript:
-${transcript}
+Interview transcript:
+${transcript}${notepadContent ? `
+
+Candidate's notepad (their actual code/design at end of interview):
+\`\`\`${language.toLowerCase()}
+${notepadContent}
+\`\`\`
+
+IMPORTANT: The notepad above IS the candidate's implementation — evaluate code_quality and dry_run based on this code even if it wasn't fully narrated in the transcript. Do NOT mark code_quality as "no code provided" if the notepad contains code.` : ""}
 
 Score the candidate on these 6 dimensions (1-5 each, where 3 = meets bar, 4 = strong, 5 = exceptional):
 

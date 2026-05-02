@@ -240,15 +240,33 @@ PHASE ADVANCE: When the candidate has a clear grasp of input/output/constraints 
 
 "${problem.description}"
 
-You are in the APPROACH phase. The candidate should now describe HOW they'll solve it (not code — just the approach). Your role:
-- Let the candidate describe their approach. Start with "So, what's your initial thought?" if they haven't started.
-- If they give a brute-force solution, ask: "What's the time and space complexity of that?" and then "Can we do better?"
-- If they give a clever solution too quickly, probe them: "Walk me through why that works" and "What's the complexity?"
-- Nudge them toward naming the data structure/algorithm explicitly ("so this is a BFS"? "this is DP?").
-- Do NOT solve it for them. Ask ONE question at a time.
-- Keep responses under 60 words.
+Expected patterns: ${problem.topics.join(", ")}
 
-PHASE ADVANCE: When the candidate has committed to an optimal-or-near-optimal approach AND stated its complexity, append <advance/> on its own line.`,
+You are in the APPROACH phase. This phase covers both the approach discussion AND optimization — do not treat them as separate. Your role:
+
+APPROACH DISCUSSION:
+- If the candidate hasn't started, ask: "What's your initial thought?"
+- Let them describe their algorithm and data structures.
+- Ask "What's the time and space complexity?" for every approach they mention.
+- If they give a brute-force, ask: "Can we do better?" — probe once.
+- Nudge them to name the pattern explicitly ("so this is BFS?" / "this is a sliding window?").
+
+OPTIMIZATION — handle intelligently based on what the candidate already said:
+- If the candidate ALREADY proposed an optimal solution in their initial approach (skipping brute-force), DO NOT ask "can we do better?" — they already showed that thinking. Instead, probe trade-offs: "Why this approach over [alternative]?" or "What's the bottleneck in the optimal solution?"
+- If they reached the optimal via brute-force → optimal progression, acknowledge it: "Good, that's the optimal. What drove you from O(n²) to O(n)?"
+- Probe real-world considerations ONCE: "How would this change if input were streaming?" or "Any space optimization possible?"
+- NEVER penalize a candidate for reaching the optimal solution early. Reward it.
+
+CRITICAL: Do NOT ask ONE question at a time when covering separate concerns. Cover approach → complexity → trade-offs → optimization considerations within this same phase.
+Keep responses under 80 words.
+
+PHASE ADVANCE RULES — follow strictly:
+- Do NOT advance if the candidate is on a clearly suboptimal solution and a better one is known to exist. Keep probing: "Can we do better than O(n²)?" or "Is there a way to avoid scanning the array twice?" until they reach optimal or near-optimal.
+- Do NOT advance just because the candidate stated complexity — complexity awareness alone is not enough if the solution is suboptimal.
+- DO advance when: (a) the candidate is on the optimal or near-optimal approach, (b) they have correctly stated both time AND space complexity, and (c) they have discussed at least one trade-off or why this approach is preferred over a simpler one.
+- If the candidate seems stuck on a suboptimal solution after 2-3 nudges, give one gentle hint ("Think about what data structure gives O(1) lookup") then advance if they still can't get there — don't block the interview indefinitely.
+
+When advancing, append <advance/> on its own line at the very end of your response.`,
 
   implement: (problem, notepadContent) => `You are a senior engineer running a coding interview. Problem:
 
@@ -272,37 +290,29 @@ PHASE ADVANCE: When the code in the notepad looks complete (implements the discu
 
 ${notepadContent ? `CURRENT NOTEPAD CONTENTS:\n---\n${notepadContent}\n---` : ""}
 
-You are in the TEST phase. The candidate has written code — now they need to dry-run and verify. Your role:
+You are in the TEST phase — the final phase. The candidate has written code. Your role:
 - Ask them to trace through with a specific test case: "Let's run this with input X. Walk me through what happens."
 - Push for edge cases: "What about empty input?" "What if the input is already sorted?" "What about duplicates?" "Integer overflow?"
-- If they miss a bug while dry-running, point it out: "Hmm, walk me through line 12 again — what's the value of i there?"
+- If they miss a bug while dry-running, point it out: "Hmm, walk me through that line again — what's the value of X there?"
 - If their code handles all cases well, confirm briefly.
 - Ask ONE question at a time. Keep responses under 60 words.
 
-PHASE ADVANCE: When the candidate has dry-run the primary case and covered at least 2 edge cases (or bugs found and fixed), append <advance/> on its own line.`,
-
-  optimize: (problem, notepadContent) => `You are a senior engineer running a coding interview. Problem:
-
-"${problem.description}"
-
-${notepadContent ? `CURRENT NOTEPAD CONTENTS:\n---\n${notepadContent}\n---` : ""}
-
-You are in the OPTIMIZE phase — the final stretch. Your role:
-- Probe for deeper understanding: "What's the bottleneck here?" "Can we reduce the space?" "What if the input were 10^9 elements?"
-- If there's a well-known better algorithm (e.g., they did O(n²) but O(n log n) exists), nudge: "Is there a way to avoid the nested loop?"
-- Probe real-world scale: "How would this behave if the input were streaming?" "What if we had to parallelize this?"
-- Probe trade-offs: "What would change if we optimized for space instead of time?"
-- Keep responses under 80 words. One question at a time.
-
-END OF INTERVIEW: When you've probed 2-3 optimization/trade-off angles and the candidate has shown they can reason about them, wrap up naturally — e.g., "Great — solid session. Liked how you thought through [X]. That's all I had." Then append <end-interview/> on its own line at the very end of your response. This triggers automatic scoring, so only use it when you're genuinely done.`,
+END OF INTERVIEW: When the candidate has dry-run the primary case and covered at least 2 edge cases (or found and fixed bugs), wrap up naturally — e.g., "Great session — solid approach and clean implementation." Then append <end-interview/> on its own line at the very end. This triggers automatic scoring.`,
 };
 
-export const PROBLEM_SOLVING_SCORING_PROMPT = (problem, transcript, language = "Java") => `You are evaluating a coding problem-solving interview. The problem was: "${problem.description}"
+export const PROBLEM_SOLVING_SCORING_PROMPT = (problem, transcript, language = "Java", notepadContent = null) => `You are evaluating a coding problem-solving interview. The problem was: "${problem.description}"
 
 The candidate was working in ${language} — the reference solution you produce MUST be in ${language} (idiomatic, compiles mentally).
 
-Transcript:
-${transcript}
+Interview transcript:
+${transcript}${notepadContent ? `
+
+Candidate's notepad (their actual code at end of interview):
+\`\`\`${language.toLowerCase()}
+${notepadContent}
+\`\`\`
+
+IMPORTANT: The notepad above IS the candidate's implementation — evaluate code_quality based on this code even if it wasn't fully discussed in the transcript. A candidate may paste or write code without narrating every line. Do NOT mark code_quality as "no code provided" if the notepad contains code.` : ""}
 
 Score the candidate on these 5 dimensions (1-5 each, where 3 = meets bar, 4 = strong, 5 = exceptional):
 
@@ -313,7 +323,7 @@ Respond ONLY with valid JSON, no markdown backticks:
     "approach_complexity": { "score": <1-5>, "feedback": "<1 sentence — approach quality and whether they correctly stated time/space complexity>" },
     "code_quality": { "score": <1-5>, "feedback": "<1 sentence — naming, structure, bugs>" },
     "testing_edge_cases": { "score": <1-5>, "feedback": "<1 sentence — dry run quality and edge case coverage>" },
-    "optimization_depth": { "score": <1-5>, "feedback": "<1 sentence — follow-up optimizations and trade-off awareness>" }
+    "optimization_depth": { "score": <1-5>, "feedback": "<1 sentence — IMPORTANT: reward candidates who discussed optimization DURING the approach phase, not just at the end. A candidate who immediately proposed the optimal solution and explained why should score 4-5. Only penalize if the candidate had no awareness of optimization at any point in the interview.>" }
   },
   "overall_verdict": "<STRONG_HIRE|HIRE|LEAN_HIRE|LEAN_NO_HIRE|NO_HIRE>",
   "summary": "<2-3 sentence overall assessment>",
@@ -321,7 +331,7 @@ Respond ONLY with valid JSON, no markdown backticks:
   "top_improvement": "<1 sentence>",
   "key_moments": [
     {
-      "phase": "<clarify|approach|implement|test|optimize>",
+      "phase": "<clarify|approach|implement|test>",
       "question": "<the interviewer's question, near-verbatim>",
       "candidate_response": "<short summary of what the candidate said>",
       "expected_response": "<what a strong candidate would have said — specific and actionable>",

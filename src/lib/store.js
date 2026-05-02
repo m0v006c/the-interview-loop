@@ -47,8 +47,11 @@ function scheduleAutoEnd(get) {
  */
 export const useInterviewStore = create((set, get) => ({
   // ─── State ───────────────────────────────────────────────────────
-  screen: "landing", // "landing" | "home" | "history" | "interview" | "scoring"
+  screen: "landing", // "landing"|"home"|"history"|"in_progress"|"learn_hub"|"learn_reading"|"interview"|"scoring"
   homeTrack: null, // which track's home page is showing (when screen === "home")
+  learnTrack: null,     // "system_design"|"low_level_design"
+  learnStageNum: 1,     // which stage (1-based)
+  learnTopicIdx: 0,     // which topic within the stage
   track: "system_design", // active track id — looked up in TRACKS
   sessionId: null, // DB row id for the active interview session
   isReviewMode: false, // true when ScoringScreen is viewing a historical session
@@ -74,6 +77,9 @@ export const useInterviewStore = create((set, get) => ({
   setScreen: (screen) => set({ screen }),
   setPhase: (phase) => set({ phase }),
   enterTrackHome: (trackId) => set({ screen: "home", homeTrack: trackId }),
+  enterLearnHub: () => set({ screen: "learn_hub" }),
+  enterLearnReading: (trackId, stageNum = 1, topicIdx = 0) => set({ screen: "learn_reading", learnTrack: trackId, learnStageNum: stageNum, learnTopicIdx: topicIdx }),
+  setLearnTopic: (stageNum, topicIdx) => set({ learnStageNum: stageNum, learnTopicIdx: topicIdx }),
   enterHistory: () => {
     stopAllSpeech();
     set({ screen: "history", isReviewMode: false });
@@ -214,9 +220,8 @@ export const useInterviewStore = create((set, get) => ({
       else systemPrompt = builder(problem);
     } else if (track === "problem_solving") {
       // canvasDescription here == current notepad contents
-      if (phase === "clarify") systemPrompt = builder(problem);
-      else if (phase === "approach") systemPrompt = builder(problem);
-      else systemPrompt = builder(problem, canvasDescription);
+      if (phase === "clarify" || phase === "approach") systemPrompt = builder(problem);
+      else systemPrompt = builder(problem, canvasDescription); // implement + test
     } else if (track === "low_level_design") {
       if (phase === "clarify") systemPrompt = builder(problem);
       else systemPrompt = builder(problem, canvasDescription);
@@ -314,7 +319,7 @@ export const useInterviewStore = create((set, get) => ({
    */
   endInterview: async () => {
     stopAllSpeech();
-    const { messages, problem, track, sessionId, timer, notepadLanguage } = get();
+    const { messages, problem, track, sessionId, timer, notepadLanguage, notepad } = get();
     const cfg = getTrack(track);
     set({ timerActive: false, isLoading: true, screen: "scoring" });
 
@@ -324,10 +329,17 @@ export const useInterviewStore = create((set, get) => ({
 
     const language = getLanguageLabel(notepadLanguage);
 
+    // For PS and LLD, include the notepad content alongside the transcript so the
+    // scorer evaluates the actual code — even if the candidate pasted it silently
+    // without discussing every line in chat.
+    const notepadForScoring = (track === "problem_solving" || track === "low_level_design")
+      ? notepad?.trim() || null
+      : null;
+
     let finalScores;
     try {
       const result = await callClaude(
-        [{ role: "user", content: cfg.scoringPrompt(problem, transcriptText, language) }],
+        [{ role: "user", content: cfg.scoringPrompt(problem, transcriptText, language, notepadForScoring) }],
         "You are a precise interview scoring system. Respond only with valid JSON, no markdown.",
         4500
       );

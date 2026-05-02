@@ -50,20 +50,18 @@ export default function UserMenu() {
             <div className="text-sm font-medium truncate">{displayName}</div>
             {user.email && <div className="text-xs text-gray-500 truncate">{user.email}</div>}
           </div>
-          <button
-            disabled
-            className="w-full text-left px-4 py-2 text-sm text-gray-400 cursor-not-allowed flex items-center gap-2"
-          >
-            <span>📊</span> Progress
-            <span className="ml-auto text-[10px]">soon</span>
-          </button>
-          <button
-            disabled
-            className="w-full text-left px-4 py-2 text-sm text-gray-400 cursor-not-allowed flex items-center gap-2"
-          >
-            <span>⚙️</span> Settings
-            <span className="ml-auto text-[10px]">soon</span>
-          </button>
+          {import.meta.env.VITE_ENABLE_TOP_NAV_EXTRAS === "true" && (
+            <>
+              <button disabled className="w-full text-left px-4 py-2 text-sm text-gray-400 cursor-not-allowed flex items-center gap-2">
+                <span>📊</span> Progress
+                <span className="ml-auto text-[10px]">soon</span>
+              </button>
+              <button disabled className="w-full text-left px-4 py-2 text-sm text-gray-400 cursor-not-allowed flex items-center gap-2">
+                <span>⚙️</span> Settings
+                <span className="ml-auto text-[10px]">soon</span>
+              </button>
+            </>
+          )}
           <div className="border-t border-gray-100 dark:border-gray-800 mt-1 pt-1">
             <button
               onClick={() => { setOpen(false); signOut(); }}
