@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 });
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-const PORT = process.env.API_PORT || 3001;
+const PORT = process.env.PORT || 3001; // Cloud Run injects PORT
 
 if (!ANTHROPIC_API_KEY) {
   console.error("\n\x1b[31m╔══════════════════════════════════════════════════════════╗");
