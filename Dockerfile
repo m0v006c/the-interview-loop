@@ -2,9 +2,12 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files and install only production deps
+# Copy package files and install production dependencies
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --production --no-fund --no-audit
+
+# Verify express was installed (fails build if not found)
+RUN node -e "require('./node_modules/express')" && echo "✓ express installed"
 
 # Copy only the server file
 COPY server.js ./
