@@ -16,7 +16,7 @@ import {
   SCORING_CONFIG,
 } from "@/lib/scoringConfig";
 
-// ─── Profiles ─────────────────────────────────────────────────────
+// ─── Profiles & Plan ──────────────────────────────────────────────
 
 export async function getProfile(userId) {
   if (!supabase || !userId) return null;
@@ -27,6 +27,103 @@ export async function getProfile(userId) {
     .maybeSingle();
   if (error) { console.warn("[db] getProfile:", error.message); return null; }
   return data;
+}
+
+/**
+ * Increment interview usage counter for the month.
+ * Resets counters automatically when the month changes.
+ * Returns updated profile or null on error.
+ */
+export async function incrementInterviewUsage(userId) {
+  if (!supabase || !userId) return null;
+  const { currentUsageMonth } = await import("@/lib/planConfig");
+  const month = currentUsageMonth();
+
+  // Fetch current usage
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("interviews_this_month, usage_month")
+    .eq("id", userId)
+    .maybeSingle();
+
+  const needsReset = profile?.usage_month !== month;
+  const updates = needsReset
+    ? { interviews_this_month: 1, ai_problems_this_month: 0, usage_month: month }
+    : { interviews_this_month: (profile?.interviews_this_month || 0) + 1 };
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(updates)
+    .eq("id", userId)
+    .select()
+    .maybeSingle();
+  if (error) { console.warn("[db] incrementInterviewUsage:", error.message); return null; }
+  return data;
+}
+
+/**
+ * Increment AI problem usage counter.
+ * Also increments lifetime total (used for free tier limit).
+ */
+export async function incrementAIProblemUsage(userId) {
+  if (!supabase || !userId) return null;
+  const { currentUsageMonth } = await import("@/lib/planConfig");
+  const month = currentUsageMonth();
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("ai_problems_this_month, ai_problems_used_total, usage_month")
+    .eq("id", userId)
+    .maybeSingle();
+
+  const needsReset = profile?.usage_month !== month;
+  const updates = needsReset
+    ? {
+        ai_problems_this_month: 1,
+        ai_problems_used_total: (profile?.ai_problems_used_total || 0) + 1,
+        usage_month: month,
+      }
+    : {
+        ai_problems_this_month: (profile?.ai_problems_this_month || 0) + 1,
+        ai_problems_used_total: (profile?.ai_problems_used_total || 0) + 1,
+      };
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(updates)
+    .eq("id", userId)
+    .select()
+    .maybeSingle();
+  if (error) { console.warn("[db] incrementAIProblemUsage:", error.message); return null; }
+  return data;
+}
+
+/** Admin/testing: manually set a user's plan. */
+export async function setUserPlan(userId, plan) {
+  if (!supabase || !userId) return null;
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ plan })
+    .eq("id", userId)
+    .select()
+    .maybeSingle();
+  if (error) { console.warn("[db] setUserPlan:", error.message); return null; }
+  return data;
+}
+
+/** Weekly skill trend data for advanced analytics. */
+export async function getSkillTrends(userId, track) {
+  if (!supabase || !userId) return [];
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("completed_at, scores, problem_meta")
+    .eq("user_id", userId)
+    .eq("track", track)
+    .eq("status", "completed")
+    .order("completed_at", { ascending: true })
+    .limit(100);
+  if (error) { console.warn("[db] getSkillTrends:", error.message); return []; }
+  return data || [];
 }
 
 // ─── Sessions ─────────────────────────────────────────────────────
@@ -237,4 +334,43 @@ export async function getSkillBreakdown(userId) {
     };
   }
   return result;
+}
+
+// ─── Analytics Reports ────────────────────────────────────────────
+
+/** ISO week key, e.g. "2026-W19" — used to cache one report per user per week. */
+export function currentWeekKey() {
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear(), 0, 1);
+  const week = Math.ceil(((now - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  return `${now.getFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
+/** Fetch the most recent analytics report for this user (any week). */
+export async function getLatestAnalyticsReport(userId) {
+  if (!supabase || !userId) return null;
+  const { data, error } = await supabase
+    .from("analytics_reports")
+    .select("*")
+    .eq("user_id", userId)
+    .order("generated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) { console.warn("[db] getLatestAnalyticsReport:", error.message); return null; }
+  return data;
+}
+
+/** Upsert a weekly report — replaces the row if the same user+week_key already exists. */
+export async function saveAnalyticsReport(userId, weekKey, report, sessionsAnalyzed) {
+  if (!supabase || !userId) return null;
+  const { data, error } = await supabase
+    .from("analytics_reports")
+    .upsert(
+      { user_id: userId, week_key: weekKey, report, sessions_analyzed: sessionsAnalyzed, generated_at: new Date().toISOString() },
+      { onConflict: "user_id,week_key" }
+    )
+    .select()
+    .maybeSingle();
+  if (error) { console.warn("[db] saveAnalyticsReport:", error.message); return null; }
+  return data;
 }

@@ -1,34 +1,4 @@
-import express from "express";
-import fetch from "node-fetch";
-import { config } from "dotenv";
-
-config(); // Load .env
-
-const app = express();
-app.use(express.json({ limit: "1mb" }));
-
-// Allow requests from Firebase Hosting and local dev
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "http://localhost:3000").split(",");
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (!origin || ALLOWED_ORIGINS.includes(origin) || ALLOWED_ORIGINS.includes("*")) {
-    res.setHeader("Access-Control-Allow-Origin", origin || "*");
-  }
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  if (req.method === "OPTIONS") return res.sendStatus(204);
-  next();
-});
-
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-const PORT = process.env.PORT || 3001; // Cloud Run injects PORT
-
-if (!ANTHROPIC_API_KEY) {
-  // Warn but keep running — Cloud Run env vars may load after startup
-  console.warn("[WARNING] ANTHROPIC_API_KEY is not set. API calls will fail until it is configured.");
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────
+// Vercel serverless function — AI-generated weekly analytics report
 
 const TRACK_LABELS = {
   system_design: "System Design",
@@ -37,7 +7,7 @@ const TRACK_LABELS = {
   low_level_design: "Low-Level Design",
 };
 
-function buildAnalyticsPrompt(dimensionAverages, recentFeedback, trendDirections, sessionCounts) {
+function buildContext(dimensionAverages, recentFeedback, trendDirections, sessionCounts) {
   let ctx = "";
   for (const [track, dims] of Object.entries(dimensionAverages)) {
     const count = sessionCounts?.[track] || 0;
@@ -51,15 +21,15 @@ function buildAnalyticsPrompt(dimensionAverages, recentFeedback, trendDirections
     ctx += "\n## Recent Session Feedback\n";
     for (const fb of recentFeedback.slice(0, 10)) {
       ctx += `\n[${TRACK_LABELS[fb.track] || fb.track} — ${fb.date}]\n`;
-      if (fb.summary)          ctx += `Summary: ${fb.summary}\n`;
-      if (fb.top_improvement)  ctx += `Key improvement area: ${fb.top_improvement}\n`;
-      if (fb.top_strength)     ctx += `Top strength: ${fb.top_strength}\n`;
+      if (fb.summary)         ctx += `Summary: ${fb.summary}\n`;
+      if (fb.top_improvement) ctx += `Key improvement area: ${fb.top_improvement}\n`;
+      if (fb.top_strength)    ctx += `Top strength: ${fb.top_strength}\n`;
     }
   }
   return ctx;
 }
 
-const ANALYTICS_SYSTEM = `You are an expert software engineering interview coach. You analyze real interview performance data and generate personalized, specific weekly improvement plans.
+const SYSTEM_PROMPT = `You are an expert software engineering interview coach. You analyze real interview performance data and generate personalized, specific weekly improvement plans.
 
 Return ONLY a valid JSON object with this exact structure — no markdown, no explanation:
 {
@@ -93,16 +63,19 @@ Rules:
 - action_steps must be immediately actionable in the next interview session
 - Return only the JSON object`;
 
-// ── Routes ───────────────────────────────────────────────────────────
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).end();
 
-// Analytics report generation — calls Claude with structured prompt
-app.post("/api/analytics-report", async (req, res) => {
+  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+  if (!ANTHROPIC_API_KEY) return res.status(500).json({ error: "API key not configured" });
+
   const { dimensionAverages, recentFeedback, trendDirections, sessionCounts } = req.body || {};
   if (!dimensionAverages || !Object.keys(dimensionAverages).length) {
     return res.status(400).json({ error: "No performance data provided" });
   }
+
   try {
-    const dataContext = buildAnalyticsPrompt(dimensionAverages, recentFeedback, trendDirections, sessionCounts);
+    const dataContext = buildContext(dimensionAverages, recentFeedback, trendDirections, sessionCounts);
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -113,49 +86,25 @@ app.post("/api/analytics-report", async (req, res) => {
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 2500,
-        system: ANALYTICS_SYSTEM,
-        messages: [{ role: "user", content: `Candidate performance data:\n${dataContext}\n\nGenerate the weekly improvement plan.` }],
+        system: SYSTEM_PROMPT,
+        messages: [
+          {
+            role: "user",
+            content: `Candidate performance data:\n${dataContext}\n\nGenerate the weekly improvement plan.`,
+          },
+        ],
       }),
     });
+
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json(data);
+
     const text = data.content?.[0]?.text || "";
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) return res.status(500).json({ error: "Could not parse AI response" });
+
     res.json({ report: JSON.parse(match[0]) });
   } catch (err) {
-    console.error("[analytics-report]", err.message);
     res.status(500).json({ error: err.message });
   }
-});
-
-// Proxy endpoint for Claude API
-app.post("/api/chat", async (req, res) => {
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify(req.body),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json(data);
-    }
-
-    res.json(data);
-  } catch (err) {
-    console.error("Proxy error:", err.message);
-    res.status(500).json({ error: { message: "Proxy server error" } });
-  }
-});
-
-app.listen(PORT, () => {
-  console.log(`\n\x1b[32m✓ API proxy running on http://localhost:${PORT}\x1b[0m`);
-  console.log(`  Proxying requests to Anthropic API\n`);
-});
+}

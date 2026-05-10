@@ -1,6 +1,6 @@
 import { useInterviewStore } from "@/lib/store";
 
-const DIMENSIONS_BY_TRACK = {
+export const DIMENSIONS_BY_TRACK = {
   system_design: [
     { key: "requirements", label: "Requirements gathering" },
     { key: "high_level_design", label: "High-level design" },

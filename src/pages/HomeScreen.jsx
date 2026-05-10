@@ -2,11 +2,16 @@ import { useState } from "react";
 import { useInterviewStore } from "@/lib/store";
 import { getRandomProblem } from "@/data/problems";
 import { TRACKS } from "@/data/tracks";
+import { usePlan } from "@/lib/usePlan";
+import UpgradePrompt from "@/components/UpgradePrompt";
 
 export default function HomeScreen() {
   const { startInterview, startCreative, isLoading, homeTrack } = useInterviewStore();
   const [activeCategory, setActiveCategory] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  const { visibleQuestionsPerTrack, canUseAIProblem, aiProblemReason, aiProblemCta, planId, interviewsRemaining } = usePlan();
 
   const trackId = homeTrack || "system_design";
   const trackCfg = TRACKS[trackId];
@@ -17,8 +22,17 @@ export default function HomeScreen() {
         ? trackCfg.problems
         : trackCfg.categories.find((c) => c.id === activeCategory)?.problems || [];
     if (difficulty !== "all") pool = pool.filter((p) => p.difficulty === difficulty);
+    // Limit visible problems for free users
+    if (visibleQuestionsPerTrack && pool.length > visibleQuestionsPerTrack) {
+      pool = pool.slice(0, visibleQuestionsPerTrack);
+    }
     return pool;
   })();
+
+  const isLimited = visibleQuestionsPerTrack !== null; // true = free tier
+  const hiddenCount = isLimited
+    ? (activeCategory === "all" ? trackCfg.problems.length : (trackCfg.categories.find(c => c.id === activeCategory)?.problems.length || 0)) - (visibleQuestionsPerTrack || 0)
+    : 0;
 
   const handleRandom = () => {
     if (trackId === "system_design") {
@@ -71,18 +85,27 @@ export default function HomeScreen() {
         {/* Action buttons */}
         <div className={`grid gap-3 mb-6 ${trackCfg.creativePrompt ? "grid-cols-2" : "grid-cols-1"}`}>
           {trackCfg.creativePrompt && (
-            <button
-              onClick={() => startCreative(trackId)}
-              disabled={isLoading}
-              className="py-3.5 rounded-xl border-2 border-purple-500 bg-purple-50 dark:bg-purple-500/10 text-purple-600 font-semibold text-sm hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-colors disabled:opacity-50 disabled:cursor-wait"
-            >
-              {isLoading ? "Generating..." : (
-                trackId === "system_design"    ? "AI-generated creative problem" :
-                trackId === "problem_solving"  ? "AI-generated coding problem" :
-                trackId === "low_level_design" ? "AI-generated LLD problem" :
-                "AI-generated problem"
-              )}
-            </button>
+            canUseAIProblem ? (
+              <button
+                onClick={() => startCreative(trackId)}
+                disabled={isLoading}
+                className="py-3.5 rounded-xl border-2 border-purple-500 bg-purple-50 dark:bg-purple-500/10 text-purple-600 font-semibold text-sm hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-colors disabled:opacity-50 disabled:cursor-wait"
+              >
+                {isLoading ? "Generating..." : (
+                  trackId === "system_design"    ? "AI-generated creative problem" :
+                  trackId === "problem_solving"  ? "AI-generated coding problem" :
+                  trackId === "low_level_design" ? "AI-generated LLD problem" :
+                  "AI-generated problem"
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowUpgradeModal(true)}
+                className="py-3.5 rounded-xl border-2 border-dashed border-purple-300 dark:border-purple-500/30 text-purple-400 font-semibold text-sm hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-colors flex items-center justify-center gap-2"
+              >
+                🔒 {trackId === "system_design" ? "AI-generated creative problem" : "AI-generated problem"}
+              </button>
+            )
           )}
           <button
             onClick={handleRandom}
@@ -213,7 +236,28 @@ export default function HomeScreen() {
             No problems match the current filters. Try a different combination.
           </div>
         )}
+
+        {/* Locked questions notice for free users */}
+        {isLimited && hiddenCount > 0 && (
+          <button
+            onClick={() => setShowUpgradeModal(true)}
+            className="mt-3 w-full py-3 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 text-sm text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+          >
+            🔒 {hiddenCount} more problems locked — upgrade to access all
+          </button>
+        )}
       </div>
+
+      {/* Upgrade modal */}
+      {showUpgradeModal && (
+        <UpgradePrompt
+          variant="modal"
+          title="Unlock all problems"
+          description={aiProblemReason || `Free plan shows 3 problems per track. Upgrade to access all 50+ problems and AI-generated questions.`}
+          cta={aiProblemCta || "View plans →"}
+          onClose={() => setShowUpgradeModal(false)}
+        />
+      )}
     </div>
   );
 }

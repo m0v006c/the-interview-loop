@@ -1,6 +1,7 @@
 import { useInterviewStore } from "@/lib/store";
 import { useAuthStore } from "@/lib/authStore";
 import UserMenu from "@/components/UserMenu";
+import NotificationBell from "@/components/NotificationBell";
 
 const SIDEBAR_TRACKS = [
   { id: "system_design",    icon: "🏛️", label: "System Design" },
@@ -15,8 +16,9 @@ const SIDEBAR_TRACKS = [
  * screens are NOT wrapped in the shell (they're focus-mode).
  */
 export default function DashboardShell({ children }) {
-  const { screen, homeTrack, enterTrackHome, goLanding, enterHistory, enterInProgress, enterLearnHub, enterLearnReading, learnTrack } = useInterviewStore();
+  const { screen, homeTrack, enterTrackHome, goLanding, enterHistory, enterInProgress, enterLearnHub, enterLearnReading, learnTrack, enterPricing, enterAnalytics } = useInterviewStore();
   const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
   const openSignIn = useAuthStore((s) => s.openSignIn);
 
   const isOverview = screen === "landing";
@@ -87,6 +89,29 @@ export default function DashboardShell({ children }) {
         )}
 
         <div className="text-[11px] uppercase tracking-wider text-gray-400 px-3 mt-6 mb-2">Account</div>
+        <nav className="flex flex-col gap-0.5 mb-1">
+          {user && (
+            <>
+              <button onClick={enterAnalytics} className={linkCls(screen === "analytics")}>
+                <span>📊</span>
+                <span className="flex-1">Analytics</span>
+                {profile?.plan === "pro" ? (
+                  <span className="text-[9px] px-1 py-0.5 rounded bg-purple-100 text-purple-700 font-semibold dark:bg-purple-500/20 dark:text-purple-400">PRO</span>
+                ) : null}
+              </button>
+              <button onClick={enterPricing} className={linkCls(screen === "pricing")}>
+                <span>💳</span>
+                <span className="flex-1">Plans</span>
+                {profile?.plan && profile.plan !== "free" ? (
+                  <span className="text-[9px] px-1 py-0.5 rounded bg-emerald-100 text-emerald-700 font-semibold dark:bg-emerald-500/20 dark:text-emerald-400 capitalize">{profile.plan}</span>
+                ) : (
+                  <span className="text-[10px] text-gray-400">Free</span>
+                )}
+              </button>
+            </>
+          )}
+        </nav>
+        {/* Account section continues below */}
         <nav className="flex flex-col gap-0.5">
           <button
             onClick={enterHistory}
@@ -128,9 +153,7 @@ export default function DashboardShell({ children }) {
           )}
           {user ? (
             <>
-              {import.meta.env.VITE_ENABLE_TOP_NAV_EXTRAS === "true" && (
-                <button className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 text-sm" title="Notifications">🔔</button>
-              )}
+              <NotificationBell />
               <UserMenu />
             </>
           ) : (

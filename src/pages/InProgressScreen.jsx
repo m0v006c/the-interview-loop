@@ -56,7 +56,7 @@ export default function InProgressScreen() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [trackFilter, setTrackFilter] = useState("all");
-  const [confirmEnd, setConfirmEnd] = useState(null); // session row pending end-confirmation
+  const [confirmEnd, setConfirmEnd] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -233,15 +233,10 @@ function InProgressRow({ session, onResume, onRetry, onEnd }) {
   const phases = cfg?.phases || [];
   const currentIdx = phaseIndex(session.track, session.phase);
 
-  const handleRowClick = (e) => {
-    if (e.target.closest("button")) return;
-    onResume();
-  };
-
   return (
     <div
       role="button"
-      onClick={handleRowClick}
+      onClick={(e) => { if (!e.target.closest("button")) onResume(); }}
       className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 flex items-center gap-4 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-colors cursor-pointer"
     >
       <div className={`w-11 h-11 rounded-xl grid place-items-center text-lg flex-shrink-0 ${meta.iconBg}`}>
@@ -271,50 +266,30 @@ function InProgressRow({ session, onResume, onRetry, onEnd }) {
         </div>
 
         <div className="text-xs text-gray-500 mt-1 flex items-center gap-3 flex-wrap">
-          <span>
-            {phaseLabel(session.track, session.phase)} phase · {currentIdx + 1} of {phases.length}
-          </span>
+          <span>{phaseLabel(session.track, session.phase)} phase · {currentIdx + 1} of {phases.length}</span>
           <span className="text-gray-300">·</span>
           <span>{formatDuration(session.duration_seconds)} · {(session.transcript?.length) || 0} messages</span>
           <span className="text-gray-300">·</span>
           <span>Last active {timeAgo(session.updated_at)}</span>
         </div>
 
-        {/* Phase progress bar */}
         <div className="flex gap-1 mt-2">
           {phases.map((p, i) => (
-            <div
-              key={p}
-              className={`h-1 flex-1 rounded-full ${
-                i < currentIdx
-                  ? "bg-indigo-500"
-                  : i === currentIdx
-                  ? "bg-indigo-300"
-                  : "bg-gray-100 dark:bg-gray-800"
-              }`}
-            />
+            <div key={p} className={`h-1 flex-1 rounded-full ${
+              i < currentIdx ? "bg-indigo-500" : i === currentIdx ? "bg-indigo-300" : "bg-gray-100 dark:bg-gray-800"
+            }`} />
           ))}
         </div>
       </div>
 
       <div className="flex items-center gap-2 flex-shrink-0">
-        <button
-          onClick={(e) => { e.stopPropagation(); onEnd(); }}
-          className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800"
-        >
+        <button onClick={(e) => { e.stopPropagation(); onEnd(); }} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800">
           End
         </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onRetry(); }}
-          className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-600 dark:hover:bg-gray-800 transition-colors"
-          title="Abandon and start the same problem fresh"
-        >
+        <button onClick={(e) => { e.stopPropagation(); onRetry(); }} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-600 dark:hover:bg-gray-800 transition-colors">
           ↻ Retry
         </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onResume(); }}
-          className="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700"
-        >
+        <button onClick={(e) => { e.stopPropagation(); onResume(); }} className="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700">
           Resume →
         </button>
       </div>

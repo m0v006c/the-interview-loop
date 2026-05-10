@@ -4,11 +4,14 @@ import { useAuthStore } from "@/lib/authStore";
 import DashboardShell from "@/components/DashboardShell";
 import SignInModal from "@/components/SignInModal";
 import LandingScreen from "@/pages/LandingScreen";
+import PublicLanding from "@/pages/PublicLanding";
 import HomeScreen from "@/pages/HomeScreen";
 import HistoryScreen from "@/pages/HistoryScreen";
 import InProgressScreen from "@/pages/InProgressScreen";
 import LearnHubScreen from "@/pages/LearnHubScreen";
 import LearnReadingScreen from "@/pages/LearnReadingScreen";
+import PricingScreen from "@/pages/PricingScreen";
+import AnalyticsScreen from "@/pages/AnalyticsScreen";
 import InterviewScreen from "@/pages/InterviewScreen";
 import BehavioralInterviewScreen from "@/pages/BehavioralInterviewScreen";
 import NotepadInterviewScreen from "@/pages/NotepadInterviewScreen";
@@ -19,6 +22,7 @@ export default function App() {
   const track = useInterviewStore((s) => s.track);
   const init = useAuthStore((s) => s.init);
   const loading = useAuthStore((s) => s.loading);
+  const user = useAuthStore((s) => s.user);
 
   // Subscribe to session / auth events once
   useEffect(() => { init(); }, [init]);
@@ -44,6 +48,14 @@ export default function App() {
     );
   }
 
+  // Non-logged-in users at landing see the public marketing page
+  if (screen === "landing" && !user) return (
+    <>
+      <PublicLanding />
+      <SignInModal />
+    </>
+  );
+
   // Interview and scoring are focus-mode — no dashboard shell
   const content = (() => {
     if (screen === "interview") {
@@ -59,6 +71,8 @@ export default function App() {
          screen === "in_progress"   ? <InProgressScreen /> :
          screen === "learn_hub"     ? <LearnHubScreen /> :
          screen === "learn_reading" ? <LearnReadingScreen /> :
+         screen === "pricing"       ? <PricingScreen /> :
+         screen === "analytics"     ? <AnalyticsScreen /> :
                                       <LandingScreen />}
       </DashboardShell>
     );

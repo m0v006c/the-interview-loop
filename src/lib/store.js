@@ -4,6 +4,7 @@ import { TRACKS, getTrack } from "@/data/tracks";
 import { DEFAULT_LANGUAGE_ID, getLanguageLabel } from "@/data/languages";
 import { useAuthStore } from "@/lib/authStore";
 import * as db from "@/lib/db";
+import { loadNotifications, saveNotifications } from "@/lib/notificationStorage";
 
 /** Stop any in-flight AI speech immediately. Called when the interview ends/exits. */
 function stopAllSpeech() {
@@ -47,7 +48,8 @@ function scheduleAutoEnd(get) {
  */
 export const useInterviewStore = create((set, get) => ({
   // ─── State ───────────────────────────────────────────────────────
-  screen: "landing", // "landing"|"home"|"history"|"in_progress"|"learn_hub"|"learn_reading"|"interview"|"scoring"
+  screen: "landing", // "landing"|"home"|"history"|"in_progress"|"learn_hub"|"learn_reading"|"pricing"|"analytics"|"interview"|"scoring"
+  feedbackNotifications: [], // [{ id, sessionId, problemTitle, track, createdAt }] — accumulates while user is away
   homeTrack: null, // which track's home page is showing (when screen === "home")
   learnTrack: null,     // "system_design"|"low_level_design"
   learnStageNum: 1,     // which stage (1-based)
@@ -75,8 +77,26 @@ export const useInterviewStore = create((set, get) => ({
   // ─── Actions ─────────────────────────────────────────────────────
 
   setScreen: (screen) => set({ screen }),
+  setFeedbackNotifications: (notifications) => set({ feedbackNotifications: notifications }),
+
+  dismissFeedbackNotification: (id) => {
+    const userId = useAuthStore.getState().user?.id;
+    set((s) => {
+      const updated = s.feedbackNotifications.filter((n) => n.id !== id);
+      saveNotifications(userId, updated);
+      return { feedbackNotifications: updated };
+    });
+  },
+
+  clearAllFeedbackNotifications: () => {
+    const userId = useAuthStore.getState().user?.id;
+    saveNotifications(userId, []);
+    set({ feedbackNotifications: [] });
+  },
   setPhase: (phase) => set({ phase }),
   enterTrackHome: (trackId) => set({ screen: "home", homeTrack: trackId }),
+  enterPricing: () => set({ screen: "pricing" }),
+  enterAnalytics: () => set({ screen: "analytics" }),
   enterLearnHub: () => set({ screen: "learn_hub" }),
   enterLearnReading: (trackId, stageNum = 1, topicIdx = 0) => set({ screen: "learn_reading", learnTrack: trackId, learnStageNum: stageNum, learnTopicIdx: topicIdx }),
   setLearnTopic: (stageNum, topicIdx) => set({ learnStageNum: stageNum, learnTopicIdx: topicIdx }),
@@ -117,6 +137,24 @@ export const useInterviewStore = create((set, get) => ({
       useAuthStore.getState().openSignIn();
       return;
     }
+
+    // Check plan limits
+    const { canStartInterview: planCheck, currentUsageMonth } = await import("@/lib/planConfig");
+    const profile = useAuthStore.getState().profile;
+    const planId = profile?.plan || "free";
+    const isCurrentMonth = profile?.usage_month === currentUsageMonth();
+    const used = isCurrentMonth ? (profile?.interviews_this_month || 0) : 0;
+    const check = planCheck(planId, used);
+    if (!check.allowed) {
+      set({ screen: "pricing" }); // redirect to pricing
+      return;
+    }
+
+    // Increment usage counter in DB (fire-and-forget)
+    const { incrementInterviewUsage } = await import("@/lib/db");
+    incrementInterviewUsage(user.id).then((updated) => {
+      if (updated) useAuthStore.getState().refreshProfile();
+    });
 
     stopAllSpeech();
     const cfg = getTrack(track);
@@ -161,6 +199,26 @@ export const useInterviewStore = create((set, get) => ({
    * creativePrompt configured (system_design, problem_solving, low_level_design).
    */
   startCreative: async (trackId = "system_design") => {
+    // Check AI problem plan limit
+    const { canUseAIProblem, currentUsageMonth } = await import("@/lib/planConfig");
+    const profile = useAuthStore.getState().profile;
+    const planId  = profile?.plan || "free";
+    const isCurrentMonth = profile?.usage_month === currentUsageMonth();
+    const usedMonth = isCurrentMonth ? (profile?.ai_problems_this_month || 0) : 0;
+    const usedTotal = profile?.ai_problems_used_total || 0;
+    const check = canUseAIProblem(planId, usedMonth, usedTotal);
+    if (!check.allowed) {
+      set({ screen: "pricing" });
+      return;
+    }
+    // Increment AI problem usage (fire-and-forget)
+    const user = useAuthStore.getState().user;
+    if (user) {
+      const { incrementAIProblemUsage } = await import("@/lib/db");
+      incrementAIProblemUsage(user.id).then((updated) => {
+        if (updated) useAuthStore.getState().refreshProfile();
+      });
+    }
     const cfg = getTrack(trackId);
     if (!cfg.creativePrompt) return;
     set({ isLoading: true });
@@ -323,15 +381,18 @@ export const useInterviewStore = create((set, get) => ({
     const cfg = getTrack(track);
     set({ timerActive: false, isLoading: true, screen: "scoring" });
 
+    // Move out of "in_progress" BEFORE the scoring call so In Progress list
+    // reflects the correct state immediately. Must be awaited — otherwise the
+    // In Progress query races against the patch and wins.
+    if (sessionId) await db.patchSession(sessionId, { status: "scoring" });
+
     const transcriptText = messages
       .map((m) => `${m.role === "user" ? "Candidate" : "Interviewer"}: ${m.content}`)
       .join("\n\n");
 
     const language = getLanguageLabel(notepadLanguage);
 
-    // For PS and LLD, include the notepad content alongside the transcript so the
-    // scorer evaluates the actual code — even if the candidate pasted it silently
-    // without discussing every line in chat.
+    // For PS and LLD, include notepad content so the scorer evaluates actual code
     const notepadForScoring = (track === "problem_solving" || track === "low_level_design")
       ? notepad?.trim() || null
       : null;
@@ -348,15 +409,90 @@ export const useInterviewStore = create((set, get) => ({
       console.error("Scoring parse failed:", e);
       finalScores = cfg.fallbackScores;
     }
-    set({ scores: finalScores, isLoading: false });
 
-    // Persist: mark session complete with scores + duration.
+    // Always persist to DB first
     if (sessionId) {
-      db.completeSession(sessionId, {
-        scores: finalScores,
-        durationSeconds: timer,
+      await db.completeSession(sessionId, { scores: finalScores, durationSeconds: timer });
+    }
+
+    // If user is still on scoring screen — update scores in place
+    if (get().screen === "scoring") {
+      set({ scores: finalScores, isLoading: false });
+    } else {
+      // User navigated away while evaluation ran — surface a notification
+      set((s) => {
+        const newNotif = {
+          id: Date.now(),
+          sessionId,
+          problemTitle: problem?.title || "Interview",
+          track,
+          createdAt: new Date().toISOString(),
+        };
+        const updated = [...s.feedbackNotifications, newNotif];
+        saveNotifications(useAuthStore.getState().user?.id, updated);
+        return { isLoading: false, feedbackNotifications: updated };
       });
     }
+  },
+
+  /**
+   * Re-run scoring for a session that got stuck in status="scoring"
+   * (e.g. tab was closed mid-evaluation). Uses the persisted transcript.
+   * Only called for sessions whose updated_at is > 2 minutes old to avoid
+   * racing with an active tab that is still evaluating the same session.
+   */
+  rescoreSession: async (sessionRow) => {
+    const { id: sessionId, track, transcript, notepad_content, duration_seconds,
+            problem_id, problem_title, problem_description, problem_meta } = sessionRow;
+    const cfg = getTrack(track);
+    if (!cfg || !transcript?.length) return;
+
+    const problem = {
+      id: problem_id,
+      title: problem_title,
+      description: problem_description,
+      company: problem_meta?.company,
+      difficulty: problem_meta?.difficulty,
+      topics: problem_meta?.topics || [],
+      focus: problem_meta?.focus,
+    };
+
+    const transcriptText = transcript
+      .map((m) => `${m.role === "user" ? "Candidate" : "Interviewer"}: ${m.content}`)
+      .join("\n\n");
+
+    const notepadForScoring = (track === "problem_solving" || track === "low_level_design")
+      ? notepad_content?.trim() || null
+      : null;
+
+    let finalScores;
+    try {
+      const result = await callClaude(
+        [{ role: "user", content: cfg.scoringPrompt(problem, transcriptText, null, notepadForScoring) }],
+        "You are a precise interview scoring system. Respond only with valid JSON, no markdown.",
+        4500
+      );
+      finalScores = parseClaudeJSON(result);
+    } catch (e) {
+      console.error("[rescoreSession] scoring failed:", e);
+      finalScores = cfg.fallbackScores;
+    }
+
+    await db.completeSession(sessionId, { scores: finalScores, durationSeconds: duration_seconds || 0 });
+
+    // Surface notification so user knows feedback is ready
+    set((s) => {
+      const newNotif = {
+        id: Date.now(),
+        sessionId,
+        problemTitle: problem_title || "Interview",
+        track,
+        createdAt: new Date().toISOString(),
+      };
+      const updated = [...s.feedbackNotifications, newNotif];
+      saveNotifications(useAuthStore.getState().user?.id, updated);
+      return { feedbackNotifications: updated };
+    });
   },
 
   /** Resume an in-progress session from the dashboard. */

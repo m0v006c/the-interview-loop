@@ -5,6 +5,8 @@ import { getTimeStatus } from "@/lib/scoringConfig";
 import KeyMomentsList from "@/components/KeyMomentsList";
 import TranscriptCard from "@/components/TranscriptCard";
 import ReferenceSolutionModal from "@/components/ReferenceSolutionModal";
+import UpgradePrompt from "@/components/UpgradePrompt";
+import { usePlan } from "@/lib/usePlan";
 
 const VERDICT_COLORS = {
   STRONG_HIRE: "#059669",
@@ -97,6 +99,10 @@ export default function ScoringScreen() {
     });
   };
 
+  const { can, openPricing } = usePlan();
+  const canSeeKeyMoments = can("key_moments");
+  const canSeeReference  = can("reference_solution");
+
   const trackCfg = getTrack(track);
   const dims = DIMENSIONS_BY_TRACK[track] || DIMENSIONS_BY_TRACK.system_design;
   const presentDims = scores ? dims.filter((d) => scores.scores?.[d.key]) : [];
@@ -140,12 +146,21 @@ export default function ScoringScreen() {
         </div>
         <div className="flex items-center gap-2">
           {scores?.ideal_solution && (
-            <button
-              onClick={() => setRefOpen(true)}
-              className="px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-medium hover:bg-indigo-100 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/20"
-            >
-              📘 Reference solution
-            </button>
+            canSeeReference ? (
+              <button
+                onClick={() => setRefOpen(true)}
+                className="px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-medium hover:bg-indigo-100 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/20"
+              >
+                📘 Reference solution
+              </button>
+            ) : (
+              <button
+                onClick={openPricing}
+                className="px-3 py-1.5 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 text-gray-400 text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                🔒 Reference solution
+              </button>
+            )
           )}
           <button
             onClick={handleRetry}
@@ -209,7 +224,15 @@ export default function ScoringScreen() {
               ))}
             </div>
           ) : (
-            <KeyMomentsList moments={scores?.key_moments || []} />
+            canSeeKeyMoments ? (
+              <KeyMomentsList moments={scores?.key_moments || []} />
+            ) : (
+              <UpgradePrompt
+                variant="banner"
+                description="Unlock key moments feedback — see what you got right and wrong with expected answers."
+                cta="Upgrade →"
+              />
+            )
           )}
 
           {/* Transcript */}
