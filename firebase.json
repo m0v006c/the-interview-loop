@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "interview-loop-stage",
+    "site": "interview-loop-stage-0",
     "public": "dist",
     "ignore": [
       "firebase.json",
